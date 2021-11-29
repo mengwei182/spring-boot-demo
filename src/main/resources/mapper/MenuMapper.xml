@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.MenuMapper">
+    <insert id="addMenu" parameterType="org.example.entity.Menu">
+        INSERT INTO menu(id, parent_id, title, level, sort, name, icon, hidden, create_time)
+        VALUES (#{id}, #{parentId}, #{title}, #{level}, #{sort}, #{name}, #{icon}, #{hidden}, #{createTime})
+    </insert>
+
+    <delete id="deleteMenu" parameterType="java.lang.String">
+        DELETE
+        FROM menu
+        WHERE id = #{id}
+    </delete>
+
+    <update id="updateMenu" parameterType="org.example.entity.Menu">
+        UPDATE menu
+        SET name = #{name}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getMenuList" parameterType="org.example.api.MenuQueryPage" resultType="org.example.entity.Menu">
+        SELECT *
+        FROM menu
+        <where>
+            <foreach collection="queryParamMap" index="key" item="value">
+                <if test="key.equals('name') and value != null">
+                    name LIKE #{value}
+                </if>
+            </foreach>
+        </where>
+        LIMIT #{offset}, #{rows}
+    </select>
+
+    <select id="getMenuListCount" parameterType="org.example.api.MenuQueryPage" resultType="java.lang.Integer">
+        SELECT *
+        FROM menu
+        <where>
+            <foreach collection="queryParamMap" index="key" item="value">
+                <if test="key.equals('name') and value != null">
+                    name LIKE #{value}
+                </if>
+            </foreach>
+        </where>
+    </select>
+
+    <select id="getMenusByUserId" parameterType="java.lang.String" resultType="org.example.entity.Menu">
+        SELECT m.*
+        FROM menu m
+             LEFT JOIN role_menu_relation rmr ON m.id = rmr.menu_id
+             LEFT JOIN user_role_relation urr ON urr.role_id = rmr.role_id
+        WHERE urr.user_id = #{userId}
+    </select>
+</mapper>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.mapper.UserRoleRelationMapper">
+    <insert id="addUserRoleRelation" parameterType="org.example.entity.UserRoleRelation">
+        INSERT INTO user_role_relation(id, user_id, role_id)
+        VALUES (#{id}, #{userId}, #{roleId})
+    </insert>
+
+    <select id="getUserRoleRelations" parameterType="java.lang.String" resultType="org.example.entity.UserRoleRelation">
+        SELECT *
+        FROM user_role_relation
+        WHERE user_id = #{userId}
+    </select>
+
+    <delete id="deleteUserRoleRelationByRoleId" parameterType="java.lang.String">
+        DELETE
+        FROM user_role_relation
+        WHERE role_id = #{roleId}
+    </delete>
+
+    <delete id="deleteUserRoleRelationByUserId" parameterType="java.lang.String">
+        DELETE
+        FROM user_role_relation
+        WHERE user_id = #{userId}
+    </delete>
+</mapper>
