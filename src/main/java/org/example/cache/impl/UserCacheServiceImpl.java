@@ -2,7 +2,7 @@ package org.example.cache.impl;
 
 import org.example.cache.UserCacheService;
 import org.example.entity.User;
-import org.example.redis.service.RedisService;
+import org.example.redis.RedisService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
