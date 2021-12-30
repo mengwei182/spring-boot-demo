@@ -1,8 +1,10 @@
 package org.example.security;
 
 import org.example.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -18,8 +20,11 @@ import javax.annotation.Resource;
 
 @Configuration
 @EnableWebSecurity
+@PropertySource("classpath:common.properties")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+    @Value("${antMatchers}")
+    private String antMatchers;
     @Resource
     private UserService userService;
     @Resource
@@ -42,10 +47,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/actuator/**").permitAll()
-                .antMatchers("/druid/**").permitAll()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/register").permitAll()
+                .antMatchers(antMatchers.split(",")).permitAll()
                 .anyRequest().authenticated();
         httpSecurity.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         httpSecurity.exceptionHandling().accessDeniedHandler(new RestfulAccessDeniedHandler()).authenticationEntryPoint(new RestfulAuthenticationEntryPoint());
