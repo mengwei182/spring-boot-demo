@@ -34,7 +34,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/**/*.js", "/**/*.png", "/**/*.ico");
+        web.ignoring().antMatchers(antMatchers.split(","));
     }
 
     @Override
