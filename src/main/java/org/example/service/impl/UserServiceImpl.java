@@ -15,7 +15,9 @@ import org.example.security.service.JwtTokenService;
 import org.example.service.UserService;
 import org.example.util.ImageVerifyCodeUtils;
 import org.example.util.MessageUtils;
-import org.example.vo.*;
+import org.example.vo.TokenVo;
+import org.example.vo.UserInfoVo;
+import org.example.vo.UsernamePasswordVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,16 +31,22 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     @Value("${jwt.tokenHead}")
     private String tokenHead;
+    @Value("${jwt.tokenHeader}")
+    private String tokenHeader;
     @Resource
     private JwtTokenService jwtTokenService;
     @Resource
@@ -82,6 +90,15 @@ public class UserServiceImpl implements UserService {
             log.error("login error,username:{},message:{}", usernamePasswordVo.getUsername(), e.getMessage());
         }
         return CommonResult.failed(I18nMessage.USER_LOGIN_FAIL);
+    }
+
+    @Override
+    public CommonResult logout(HttpServletRequest request) {
+        String token = request.getHeader(tokenHeader);
+        String username = jwtTokenService.getUsername(token);
+        CustomUserDetails customUserDetails = (CustomUserDetails) loadUserByUsername(username);
+        userCacheService.deleteUserByUserId(customUserDetails.getUser().getId());
+        return CommonResult.success();
     }
 
     @Override

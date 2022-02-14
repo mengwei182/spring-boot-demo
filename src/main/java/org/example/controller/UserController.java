@@ -9,6 +9,7 @@ import org.example.vo.UsernamePasswordVo;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -22,6 +23,11 @@ public class UserController {
     @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
     public CommonResult login(@RequestBody UsernamePasswordVo usernamePasswordVo) {
         return userService.login(usernamePasswordVo);
+    }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
+    public CommonResult logout(HttpServletRequest request) {
+        return userService.logout(request);
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")

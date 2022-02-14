@@ -7,12 +7,15 @@ import org.example.entity.UserRoleRelation;
 import org.example.vo.UsernamePasswordVo;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
 
 public interface UserService extends UserDetailsService {
     CommonResult login(UsernamePasswordVo usernamePasswordVo);
+
+    CommonResult logout(HttpServletRequest request);
 
     CommonResult register(User user);
 
