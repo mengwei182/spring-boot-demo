@@ -25,7 +25,7 @@ spring:
     port: 6379
     password: mengwei131575585
     timeout: 3000ms
-    jedis:
+    lettuce:
       pool:
         enabled: true
         min-idle: 0

@@ -17,13 +17,13 @@ public class UserCacheServiceImpl implements UserCacheService {
 
     @Override
     public void setUser(User user) {
-        redisService.set(USER_CACHE_PREFIX.concat(user.getId()), user);
-        redisService.set(USER_CACHE_PREFIX.concat(user.getUsername()), user);
+        redisService.getValueOperations().set(USER_CACHE_PREFIX.concat(user.getId()), user);
+        redisService.getValueOperations().set(USER_CACHE_PREFIX.concat(user.getUsername()), user);
     }
 
     @Override
     public User getUserBuUserId(String userId) {
-        return (User) redisService.get(USER_CACHE_PREFIX.concat(userId));
+        return (User) redisService.getValueOperations().get(USER_CACHE_PREFIX.concat(userId));
     }
 
     @Override
@@ -33,18 +33,18 @@ public class UserCacheServiceImpl implements UserCacheService {
 
     @Override
     public User getUserByUsername(String username) {
-        return (User) redisService.get(USER_CACHE_PREFIX.concat(username));
+        return (User) redisService.getValueOperations().get(USER_CACHE_PREFIX.concat(username));
     }
 
     @Override
     public void setPhoneVerifyCode(String phone, String verifyCode) {
-        redisService.set(USER_CACHE_PHONE_VERIFY_PREFIX.concat(phone), verifyCode);
+        redisService.getValueOperations().set(USER_CACHE_PHONE_VERIFY_PREFIX.concat(phone), verifyCode);
 
     }
 
     @Override
     public String getPhoneVerifyCode(String phone) {
-        return (String) redisService.get(USER_CACHE_PHONE_VERIFY_PREFIX.concat(phone));
+        return (String) redisService.getValueOperations().get(USER_CACHE_PHONE_VERIFY_PREFIX.concat(phone));
     }
 
     @Override
@@ -54,12 +54,12 @@ public class UserCacheServiceImpl implements UserCacheService {
 
     @Override
     public void setImageVerifyCode(String account, String verifyCode) {
-        redisService.set(USER_CACHE_IMAGE_VERIFY_PREFIX.concat(account), verifyCode);
+        redisService.getValueOperations().set(USER_CACHE_IMAGE_VERIFY_PREFIX.concat(account), verifyCode);
     }
 
     @Override
     public String getImageVerifyCode(String account) {
-        return (String) redisService.get(USER_CACHE_IMAGE_VERIFY_PREFIX.concat(account));
+        return (String) redisService.getValueOperations().get(USER_CACHE_IMAGE_VERIFY_PREFIX.concat(account));
     }
 
     @Override
