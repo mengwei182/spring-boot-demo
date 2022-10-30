@@ -13,7 +13,6 @@ public class QueryPage {
     private static final String ASC = "ASC";
     private static final String DESC = "DESC";
     private final Map<String, String> sortParamMap = new HashMap<>();
-    private final Map<String, Object> queryParamMap = new HashMap<>();
 
     public int getRows() {
         return rows;
@@ -54,15 +53,6 @@ public class QueryPage {
 
     public Map<String, String> getSortParamMap() {
         return sortParamMap;
-    }
-
-    public Map<String, Object> getQueryParamMap() {
-        return queryParamMap;
-    }
-
-    public QueryPage addQueryParam(String paramName, Object param) {
-        this.queryParamMap.put(paramName, param);
-        return this;
     }
 
     public QueryPage addASCSortParam(String paramName) {

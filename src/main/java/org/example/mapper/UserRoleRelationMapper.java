@@ -1,17 +1,9 @@
 package org.example.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.example.entity.UserRoleRelation;
 
-import java.util.List;
-
 @Mapper
-public interface UserRoleRelationMapper {
-    void addUserRoleRelation(UserRoleRelation userRoleRelation);
-
-    List<UserRoleRelation> getUserRoleRelations(String userId);
-
-    void deleteUserRoleRelationByRoleId(String roleId);
-
-    void deleteUserRoleRelationByUserId(String userId);
+public interface UserRoleRelationMapper extends BaseMapper<UserRoleRelation> {
 }

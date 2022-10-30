@@ -1,23 +1,13 @@
 package org.example.cache;
 
-import org.example.entity.User;
-
 public interface UserCacheService {
-    void setUser(User user);
-
-    User getUserBuUserId(String userId);
-
-    void deleteUserByUserId(String userId);
-
-    User getUserByUsername(String username);
-
-    void setPhoneVerifyCode(String phone, String verifyCode);
+    void setPhoneVerifyCode(String phone, String verifyCode, Long timeout);
 
     String getPhoneVerifyCode(String phone);
 
     void deletePhoneVerifyCode(String phone);
 
-    void setImageVerifyCode(String account, String verifyCode);
+    void setImageVerifyCode(String account, String verifyCode, Long timeout);
 
     String getImageVerifyCode(String account);
 

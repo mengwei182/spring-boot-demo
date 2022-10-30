@@ -2,81 +2,75 @@ package org.example.controller;
 
 import org.example.api.UserQueryPage;
 import org.example.common.model.CommonResult;
-import org.example.entity.User;
-import org.example.entity.UserRoleRelation;
+import org.example.common.usercontext.UserContext;
+import org.example.entity.vo.UserInfoVo;
+import org.example.entity.vo.UserRoleRelationVo;
+import org.example.entity.vo.UsernamePasswordVo;
 import org.example.service.UserService;
-import org.example.vo.UsernamePasswordVo;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.security.Principal;
 
 @RestController
 public class UserController {
     @Resource
     private UserService userService;
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public CommonResult login(@RequestBody UsernamePasswordVo usernamePasswordVo) {
-        return userService.login(usernamePasswordVo);
+    @RequestMapping("/login")
+    public CommonResult login(@Valid @RequestBody UsernamePasswordVo usernamePasswordVo) {
+        return CommonResult.success(userService.login(usernamePasswordVo));
     }
 
-    @RequestMapping(value = "/logout", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public CommonResult logout(HttpServletRequest request) {
-        return userService.logout(request);
+    @RequestMapping("/logout")
+    public CommonResult logout() {
+        return CommonResult.success(userService.logout());
     }
 
-    @RequestMapping(value = "/register", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public CommonResult register(@RequestBody User user) {
-        return userService.register(user);
+    @RequestMapping("/register")
+    public CommonResult register(@Valid @RequestBody UserInfoVo userInfoVo) {
+        return CommonResult.success(userService.register(userInfoVo));
     }
 
-    @RequestMapping(value = "/phone/verify/code", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
+    @RequestMapping("/phone/verify/code")
     public CommonResult getPhoneVerifyCode(@RequestParam String phone) {
-        return userService.getPhoneVerifyCode(phone);
+        return CommonResult.success(userService.generatePhoneVerifyCode(phone));
     }
 
-    @RequestMapping(value = "/image/verify/code", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
-    public void getImageVerifyCode(HttpServletResponse response, @RequestParam String account) throws IOException {
-        userService.getImageVerifyCode(response, account);
+    @RequestMapping("/image/verify/code")
+    public void getImageVerifyCode(HttpServletResponse response) throws IOException {
+        userService.generateImageVerifyCode(response);
     }
 
-    @RequestMapping(value = "/user/list", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
+    @RequestMapping("/user/list")
     public CommonResult getUserList(@ModelAttribute UserQueryPage queryPage) {
-        return userService.getUserList(queryPage);
+        return CommonResult.success(userService.getUserList(queryPage));
     }
 
-    @RequestMapping(value = "/user/info", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
-    public CommonResult getUserInfo(Principal principal) {
-        return userService.getUserInfo(principal);
+    @RequestMapping("/user/info")
+    public CommonResult getUserInfo() {
+        return CommonResult.success(userService.getUserInfo(UserContext.get().getUserId()));
     }
 
-    @RequestMapping(value = "/user/info/id", method = RequestMethod.GET, produces = "application/json", consumes = "application/json")
-    public CommonResult getUserInfoById(@RequestParam String userId) {
-        return userService.getUserInfoById(userId);
+    @RequestMapping("/user/edit")
+    public CommonResult updateUser(@RequestBody UserInfoVo userInfoVo) {
+        return CommonResult.success(userService.updateUser(userInfoVo));
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-    public CommonResult updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
-    }
-
-    @RequestMapping(value = "/user/password/update", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
+    @RequestMapping("/user/updatePassword")
     public CommonResult updateUserPassword(@Valid @RequestBody UsernamePasswordVo usernamePasswordVo) {
-        return userService.updateUserPassword(usernamePasswordVo);
+        return CommonResult.success(userService.updateUserPassword(usernamePasswordVo));
     }
 
-    @RequestMapping(value = "/user/role/update", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-    public CommonResult updateUserRole(@RequestBody UserRoleRelation userRoleRelation) {
-        return userService.updateUserRole(userRoleRelation);
+    @RequestMapping("/user/updateRole")
+    public CommonResult updateUserRole(@RequestBody UserRoleRelationVo userRoleRelationVo) {
+        return CommonResult.success(userService.updateUserRole(userRoleRelationVo));
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/json")
-    public CommonResult deleteUser(@RequestParam String userId) {
-        return userService.deleteUser(userId);
+    @RequestMapping("/user/delete")
+    public CommonResult deleteUser(@RequestParam String id) {
+        return CommonResult.success(userService.deleteUser(id));
     }
 }

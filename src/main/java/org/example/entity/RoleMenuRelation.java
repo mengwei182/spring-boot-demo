@@ -1,19 +1,17 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-import java.util.List;
-
+/**
+ * @author 李辉
+ * @since 2022/10/29
+ */
 @Data
-public class RoleMenuRelation {
-    // table column
-    private String id;
+@TableName("role_menu_relation")
+@EqualsAndHashCode(callSuper = true)
+public class RoleMenuRelation extends BaseEntity {
     private String roleId;
     private String menuId;
-    private Date createTime;
-    private Date updateTime;
-
-    // not table column
-    private List<String> menuIds;
 }

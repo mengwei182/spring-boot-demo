@@ -1,61 +1,60 @@
 package org.example.common.model;
 
 import lombok.Data;
-import org.example.common.global.I18nMessage;
-import org.example.common.util.I18nUtils;
+import org.example.common.global.ResultCode;
 
 @Data
 public class CommonResult {
-    private int code;
+    private Integer code;
     private String message;
     private Object data;
 
     private CommonResult() {
     }
 
-    private CommonResult(int code, String message, Object data) {
+    private CommonResult(Integer code, String message, Object data) {
         this.code = code;
-        this.message = I18nUtils.getMessage(message);
+        this.message = message;
         this.data = data;
     }
 
     public static CommonResult success() {
-        return new CommonResult(ResultCode.SUCCESS, I18nMessage.SUCCESS, null);
+        return new CommonResult(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getName(), null);
     }
 
     public static CommonResult success(Object data) {
-        return new CommonResult(ResultCode.SUCCESS, I18nMessage.SUCCESS, data);
+        return new CommonResult(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getName(), data);
     }
 
     public static CommonResult success(String message) {
-        return new CommonResult(ResultCode.SUCCESS, message, null);
+        return new CommonResult(ResultCode.SUCCESS.getCode(), message, null);
     }
 
     public static CommonResult success(String message, Object data) {
-        return new CommonResult(ResultCode.SUCCESS, message, data);
+        return new CommonResult(ResultCode.SUCCESS.getCode(), message, data);
     }
 
-    public static CommonResult failed() {
-        return new CommonResult(ResultCode.FAILED, I18nMessage.FAIL, null);
+    public static CommonResult error() {
+        return new CommonResult(ResultCode.ERROR.getCode(), ResultCode.ERROR.getName(), null);
     }
 
-    public static CommonResult failed(Object data) {
-        return new CommonResult(ResultCode.FAILED, I18nMessage.FAIL, data);
+    public static CommonResult error(Object data) {
+        return new CommonResult(ResultCode.ERROR.getCode(), ResultCode.ERROR.getName(), data);
     }
 
-    public static CommonResult failed(String message) {
-        return new CommonResult(ResultCode.FAILED, message, null);
+    public static CommonResult error(String message) {
+        return new CommonResult(ResultCode.ERROR.getCode(), message, null);
     }
 
-    public static CommonResult failed(String message, Object data) {
-        return new CommonResult(ResultCode.FAILED, message, data);
+    public static CommonResult error(String message, Object data) {
+        return new CommonResult(ResultCode.ERROR.getCode(), message, data);
     }
 
-    public static CommonResult unauthorized(Object data) {
-        return new CommonResult(ResultCode.UNAUTHORIZED, I18nMessage.NO_ACCESS, data);
+    public static CommonResult unauthorized() {
+        return new CommonResult(ResultCode.UNAUTHORIZED.getCode(), ResultCode.UNAUTHORIZED.getName(), null);
     }
 
-    public static CommonResult forbidden(Object data) {
-        return new CommonResult(ResultCode.FORBIDDEN, I18nMessage.PERMISSION_VERIFICATION_FAILED, data);
+    public static CommonResult forbidden() {
+        return new CommonResult(ResultCode.FORBIDDEN.getCode(), ResultCode.FORBIDDEN.getName(), null);
     }
 }

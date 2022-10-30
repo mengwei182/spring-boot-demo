@@ -1,15 +1,21 @@
 package org.example.service.impl;
 
-import org.example.common.global.I18nMessage;
-import org.example.common.model.CommonResult;
-import org.example.common.util.CommonUtils;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import org.example.common.exception.CommonException;
+import org.example.common.global.GlobalResultVariables;
 import org.example.entity.Role;
 import org.example.entity.RoleMenuRelation;
+import org.example.entity.UserRoleRelation;
+import org.example.entity.vo.RoleMenuRelationVo;
+import org.example.entity.vo.RoleVo;
 import org.example.mapper.RoleMapper;
 import org.example.mapper.RoleMenuRelationMapper;
 import org.example.mapper.UserRoleRelationMapper;
 import org.example.service.RoleService;
+import org.example.util.CommonUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -25,42 +31,62 @@ public class RoleServiceImpl implements RoleService {
     private RoleMenuRelationMapper roleMenuRelationMapper;
 
     @Override
-    public CommonResult addRole(Role role) {
-        role.setId(CommonUtils.getUUID());
-        roleMapper.addRole(role);
-        return CommonResult.success();
+    public Boolean addRole(RoleVo roleVo) {
+        Role role = new Role();
+        BeanUtils.copyProperties(roleVo, role);
+        role.setId(CommonUtils.uuid());
+        roleMapper.insert(role);
+        return true;
     }
 
     @Override
-    public CommonResult deleteRole(String id) {
-        roleMapper.deleteRole(id);
-        userRoleRelationMapper.deleteUserRoleRelationByRoleId(id);
-        roleMenuRelationMapper.deleteRoleMenuRelationByRoleId(id);
-        return CommonResult.success();
-    }
-
-    @Override
-    public CommonResult updateRole(Role role) {
-        roleMapper.updateRole(role);
-        return CommonResult.success();
-    }
-
-    @Override
-    public CommonResult updateRoleMenu(RoleMenuRelation roleMenuRelation) {
-        if (roleMapper.getRoleByRoleId(roleMenuRelation.getRoleId()) == null) {
-            return CommonResult.failed(I18nMessage.PERMISSION_VERIFICATION_FAILED);
+    @Transactional
+    public Boolean deleteRole(String id) {
+        Role role = roleMapper.selectById(id);
+        if (role == null) {
+            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
         }
-        roleMenuRelationMapper.deleteRoleMenuRelationByRoleId(roleMenuRelation.getRoleId());
-        List<String> menuIds = roleMenuRelation.getMenuIds();
+        roleMapper.deleteById(id);
+        QueryWrapper<UserRoleRelation> userRoleRelationQueryWrapper = new QueryWrapper<>();
+        userRoleRelationQueryWrapper.lambda().eq(UserRoleRelation::getRoleId, id);
+        userRoleRelationMapper.delete(userRoleRelationQueryWrapper);
+        QueryWrapper<RoleMenuRelation> roleMenuRelationQueryWrapper = new QueryWrapper<>();
+        roleMenuRelationQueryWrapper.lambda().eq(RoleMenuRelation::getRoleId, id);
+        roleMenuRelationMapper.delete(roleMenuRelationQueryWrapper);
+        return true;
+    }
+
+    @Override
+    public Boolean updateRole(RoleVo roleVo) {
+        Role role = roleMapper.selectById(roleVo.getId());
+        if (role == null) {
+            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
+        }
+        role = new Role();
+        BeanUtils.copyProperties(roleVo, role);
+        roleMapper.updateById(role);
+        return true;
+    }
+
+    @Override
+    public Boolean updateRoleMenu(RoleMenuRelationVo roleMenuRelationVo) {
+        Role role = roleMapper.selectById(roleMenuRelationVo.getRoleId());
+        if (role == null) {
+            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
+        }
+        QueryWrapper<RoleMenuRelation> roleMenuRelationQueryWrapper = new QueryWrapper<>();
+        roleMenuRelationQueryWrapper.lambda().eq(RoleMenuRelation::getRoleId, roleMenuRelationVo.getRoleId());
+        roleMenuRelationMapper.delete(roleMenuRelationQueryWrapper);
+        List<String> menuIds = roleMenuRelationVo.getMenuIds();
         if (CollectionUtils.isEmpty(menuIds)) {
             menuIds.forEach(menuId -> {
-                RoleMenuRelation rmr = new RoleMenuRelation();
-                rmr.setId(CommonUtils.getUUID());
-                rmr.setRoleId(roleMenuRelation.getRoleId());
-                rmr.setMenuId(menuId);
-                roleMenuRelationMapper.addRoleMenuRelation(rmr);
+                RoleMenuRelation roleMenuRelation = new RoleMenuRelation();
+                roleMenuRelation.setId(CommonUtils.uuid());
+                roleMenuRelation.setRoleId(roleMenuRelationVo.getRoleId());
+                roleMenuRelation.setMenuId(menuId);
+                roleMenuRelationMapper.insert(roleMenuRelation);
             });
         }
-        return CommonResult.success();
+        return true;
     }
 }

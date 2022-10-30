@@ -1,15 +1,9 @@
 package org.example.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.example.entity.RoleResourceRelation;
 
-import java.util.List;
-
 @Mapper
-public interface RoleResourceRelationMapper {
-    void addRoleResourceRelation(RoleResourceRelation roleResourceRelation);
-
-    List<RoleResourceRelation> getRoleResourceRelations(String userId);
-
-    List<RoleResourceRelation> getAllRoleResourceRelationList();
+public interface RoleResourceRelationMapper extends BaseMapper<RoleResourceRelation> {
 }

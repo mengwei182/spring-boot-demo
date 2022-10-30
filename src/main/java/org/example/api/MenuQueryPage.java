@@ -1,16 +1,11 @@
 package org.example.api;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.example.common.model.QueryPage;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class MenuQueryPage extends QueryPage {
     private String name;
-
-    public String getUsername() {
-        return name;
-    }
-
-    public void setUsername(String name) {
-        this.name = name;
-        super.addQueryParam("name", "%".concat(this.name).concat("%"));
-    }
 }

@@ -1,15 +1,18 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
+/**
+ * @author 李辉
+ * @since 2022/10/29
+ */
 @Data
-public class ResourceCategory {
-    // table column
-    private String id;
+@TableName("resource_category")
+@EqualsAndHashCode(callSuper = true)
+public class ResourceCategory extends BaseEntity {
     private String name;
     private Integer sort;
-    private Date createTime;
-    private Date updateTime;
+    private String description;
 }

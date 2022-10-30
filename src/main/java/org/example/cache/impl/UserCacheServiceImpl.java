@@ -1,11 +1,11 @@
 package org.example.cache.impl;
 
 import org.example.cache.UserCacheService;
-import org.example.entity.User;
 import org.example.redis.RedisService;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserCacheServiceImpl implements UserCacheService {
@@ -16,30 +16,12 @@ public class UserCacheServiceImpl implements UserCacheService {
     private static final String USER_CACHE_IMAGE_VERIFY_PREFIX = "USER_CACHE_IMAGE_VERIFY_PREFIX_";
 
     @Override
-    public void setUser(User user) {
-        redisService.getValueOperations().set(USER_CACHE_PREFIX.concat(user.getId()), user);
-        redisService.getValueOperations().set(USER_CACHE_PREFIX.concat(user.getUsername()), user);
-    }
-
-    @Override
-    public User getUserBuUserId(String userId) {
-        return (User) redisService.getValueOperations().get(USER_CACHE_PREFIX.concat(userId));
-    }
-
-    @Override
-    public void deleteUserByUserId(String userId) {
-        redisService.remove(userId);
-    }
-
-    @Override
-    public User getUserByUsername(String username) {
-        return (User) redisService.getValueOperations().get(USER_CACHE_PREFIX.concat(username));
-    }
-
-    @Override
-    public void setPhoneVerifyCode(String phone, String verifyCode) {
-        redisService.getValueOperations().set(USER_CACHE_PHONE_VERIFY_PREFIX.concat(phone), verifyCode);
-
+    public void setPhoneVerifyCode(String phone, String verifyCode, Long timeout) {
+        if (timeout != null && timeout > 0) {
+            redisService.getValueOperations().set(USER_CACHE_PHONE_VERIFY_PREFIX.concat(phone), verifyCode, timeout, TimeUnit.MINUTES);
+        } else {
+            redisService.getValueOperations().set(USER_CACHE_PHONE_VERIFY_PREFIX.concat(phone), verifyCode);
+        }
     }
 
     @Override
@@ -53,8 +35,12 @@ public class UserCacheServiceImpl implements UserCacheService {
     }
 
     @Override
-    public void setImageVerifyCode(String account, String verifyCode) {
-        redisService.getValueOperations().set(USER_CACHE_IMAGE_VERIFY_PREFIX.concat(account), verifyCode);
+    public void setImageVerifyCode(String account, String verifyCode, Long timeout) {
+        if (timeout != null && timeout > 0) {
+            redisService.getValueOperations().set(USER_CACHE_IMAGE_VERIFY_PREFIX.concat(account), verifyCode, timeout, TimeUnit.MINUTES);
+        } else {
+            redisService.getValueOperations().set(USER_CACHE_IMAGE_VERIFY_PREFIX.concat(account), verifyCode);
+        }
     }
 
     @Override

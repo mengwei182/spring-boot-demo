@@ -1,15 +1,15 @@
 package org.example.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.api.MenuQueryPage;
-import org.example.common.model.CommonResult;
-import org.example.entity.Menu;
+import org.example.entity.vo.MenuVo;
 
 public interface MenuService {
-    CommonResult addMenu(Menu menu);
+    Boolean addMenu(MenuVo menuVo);
 
-    CommonResult getMenuList(MenuQueryPage queryPage);
+    Page<MenuVo> getMenuList(MenuQueryPage queryPage);
 
-    CommonResult deleteMenu(String id);
+    Boolean deleteMenu(String id);
 
-    CommonResult updateMenu(Menu menu);
+    Boolean updateMenu(MenuVo menuVo);
 }

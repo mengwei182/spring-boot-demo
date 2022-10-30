@@ -1,54 +1,42 @@
 package org.example.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.example.api.UserQueryPage;
 import org.example.cache.UserCacheService;
-import org.example.common.global.I18nMessage;
-import org.example.common.model.CommonResult;
-import org.example.common.model.CustomUserDetails;
-import org.example.common.model.Page;
-import org.example.common.model.QueryPage;
-import org.example.common.util.CommonUtils;
-import org.example.common.util.PageUtils;
-import org.example.entity.*;
+import org.example.common.exception.CommonException;
+import org.example.common.global.GlobalResultVariables;
+import org.example.common.usercontext.UserContext;
+import org.example.entity.Menu;
+import org.example.entity.Role;
+import org.example.entity.User;
+import org.example.entity.UserRoleRelation;
+import org.example.entity.vo.TokenVo;
+import org.example.entity.vo.UserInfoVo;
+import org.example.entity.vo.UserRoleRelationVo;
+import org.example.entity.vo.UsernamePasswordVo;
 import org.example.mapper.*;
-import org.example.security.service.JwtTokenService;
 import org.example.service.UserService;
-import org.example.util.ImageVerifyCodeUtils;
-import org.example.util.MessageUtils;
-import org.example.vo.TokenVo;
-import org.example.vo.UserInfoVo;
-import org.example.vo.UsernamePasswordVo;
+import org.example.util.*;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-    @Value("${jwt.tokenHead}")
-    private String tokenHead;
-    @Value("${jwt.tokenHeader}")
-    private String tokenHeader;
-    @Resource
-    private JwtTokenService jwtTokenService;
     @Resource
     private UserMapper userMapper;
     @Resource
@@ -65,107 +53,99 @@ public class UserServiceImpl implements UserService {
     private UserCacheService userCacheService;
 
     @Override
-    public CommonResult login(UsernamePasswordVo usernamePasswordVo) {
+    public String login(UsernamePasswordVo usernamePasswordVo) {
         String username = usernamePasswordVo.getUsername();
         String password = usernamePasswordVo.getPassword();
-        if (!StringUtils.hasLength(username) || !StringUtils.hasLength(password)) {
-            return CommonResult.failed(I18nMessage.NOT_LOGGED_EXPIRED);
+        if (!StringUtils.hasLength(username)) {
+            throw new CommonException(GlobalResultVariables.USERNAME_NULL);
         }
-        User user = userMapper.getUserByUsername(username);
+        if (!StringUtils.hasLength(password)) {
+            throw new CommonException(GlobalResultVariables.PASSWORD_NULL);
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(User::getUsername, username);
+        User user = userMapper.selectOne(queryWrapper);
         if (user == null) {
-            return CommonResult.failed(I18nMessage.USER_NOT_EXIST);
+            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
         }
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            return CommonResult.failed(I18nMessage.USER_PASSWORD_ERROR);
+            throw new CommonException(GlobalResultVariables.PASSWORD_ERROR);
         }
-        try {
-            CustomUserDetails customUserDetails = (CustomUserDetails) this.loadUserByUsername(username);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = jwtTokenService.generateToken(customUserDetails);
-            userCacheService.setUser(customUserDetails.getUser());
-            userMapper.updateLoginTime(customUserDetails.getUser().getId(), new Date());
-            return CommonResult.success(new TokenVo(token, tokenHead));
-        } catch (Exception e) {
-            log.error("login error,username:{},message:{}", usernamePasswordVo.getUsername(), e.getMessage());
-        }
-        return CommonResult.failed(I18nMessage.USER_LOGIN_FAIL);
+        Date loginTime = new Date();
+        UserInfoVo userInfoVo = buildUserVo(user);
+        TokenVo<?> tokenVo = new TokenVo<>(user.getId(), loginTime, 60 * 60L, userInfoVo);
+        String token = TokenUtil.sign(tokenVo);
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().set(User::getLoginTime, new Date()).eq(User::getId, user.getId());
+        userMapper.update(null, updateWrapper);
+        return token;
     }
 
     @Override
-    public CommonResult logout(HttpServletRequest request) {
-        String token = request.getHeader(tokenHeader);
-        String username = jwtTokenService.getUsername(token);
-        CustomUserDetails customUserDetails = (CustomUserDetails) loadUserByUsername(username);
-        userCacheService.deleteUserByUserId(customUserDetails.getUser().getId());
-        return CommonResult.success();
+    public Boolean logout() {
+        UserContext.remove();
+        return true;
     }
 
     @Override
-    public CommonResult register(User user) {
-        String username = user.getUsername();
-        String password = user.getPassword();
-        if (!StringUtils.hasLength(username) || !StringUtils.hasLength(password)) {
-            return CommonResult.failed(I18nMessage.USERNAME_PASSWORD_NOTNULL);
+    public Boolean register(UserInfoVo userInfoVo) {
+        String username = userInfoVo.getUsername();
+        String password = userInfoVo.getPassword();
+        if (!StringUtils.hasLength(username)) {
+            throw new CommonException(GlobalResultVariables.USERNAME_NULL);
         }
-        User u = userMapper.getUserByUsername(username);
-        if (u != null) {
-            return CommonResult.failed(I18nMessage.USER_EXIST);
+        if (!StringUtils.hasLength(password)) {
+            throw new CommonException(GlobalResultVariables.PASSWORD_NULL);
         }
-        u = new User();
-        BeanUtils.copyProperties(user, u);
-        u.setId(CommonUtils.getUUID());
-        u.setPassword(passwordEncoder.encode(password));
-        userMapper.addUser(u);
-        return CommonResult.success();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(User::getUsername, username);
+        User user = userMapper.selectOne(queryWrapper);
+        if (user != null) {
+            throw new CommonException(GlobalResultVariables.USER_EXIST);
+        }
+        user = new User();
+        BeanUtils.copyProperties(userInfoVo, user);
+        user.setId(CommonUtils.uuid());
+        user.setPassword(passwordEncoder.encode(password));
+        user.setCreateId("");
+        user.setUpdateId("");
+        userMapper.insert(user);
+        return true;
     }
 
     @Override
-    public CommonResult getPhoneVerifyCode(String phone) {
+    public Boolean generatePhoneVerifyCode(String phone) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 6; i++) {
             sb.append((int) (Math.random() * 10));
         }
         String verifyCode = sb.toString();
         if (MessageUtils.sendMessage(phone, verifyCode)) {
-            userCacheService.setPhoneVerifyCode(phone, verifyCode);
-            return CommonResult.success(I18nMessage.VERIFY_CODE_SEND_SUCCESS);
+            userCacheService.setPhoneVerifyCode(phone, verifyCode, 5L);
+            return true;
         }
-        return CommonResult.failed(I18nMessage.VERIFY_CODE_SEND_FAIL);
+        return false;
     }
 
     @Override
-    public void getImageVerifyCode(HttpServletResponse response, String account) throws IOException {
+    public void generateImageVerifyCode(HttpServletResponse response) throws IOException {
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
         response.setContentType("image/jpeg");
         ServletOutputStream servletOutputStream = response.getOutputStream();
         String verifyCode = ImageVerifyCodeUtils.outputVerifyImage(130, 30, servletOutputStream, 6);
-        userCacheService.setImageVerifyCode(account, verifyCode);
+        userCacheService.setImageVerifyCode(UserContext.get().getUserId(), verifyCode, 5L);
         servletOutputStream.close();
     }
 
     @Override
-    public CommonResult getUserInfo(Principal principal) {
-        String username = principal.getName();
-        if (!StringUtils.hasLength(username)) {
-            return CommonResult.failed(I18nMessage.USER_NOT_EXIST);
+    public UserInfoVo getUserInfo(String id) {
+        if (!StringUtils.hasLength(id)) {
+            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
         }
-        User user = userCacheService.getUserByUsername(username);
-        if (user == null) {
-            user = userMapper.getUserByUsername(username);
-        }
-        return CommonResult.success(buildUserVo(user));
-    }
-
-    @Override
-    public CommonResult getUserInfoById(String userId) {
-        User user = userCacheService.getUserBuUserId(userId);
-        if (user == null) {
-            user = userMapper.getUserByUserId(userId);
-        }
-        return CommonResult.success(buildUserVo(user));
+        User user = userMapper.selectById(id);
+        return buildUserVo(user);
     }
 
     private UserInfoVo buildUserVo(User user) {
@@ -179,78 +159,76 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public CommonResult getUserList(QueryPage queryPage) {
-        List<User> userList = userMapper.getUserList(queryPage);
-        Integer total = userMapper.getUserListCount(queryPage);
-        Page page = PageUtils.wrapper(queryPage, userList, total);
-        return CommonResult.success(page);
+    public Page<UserInfoVo> getUserList(UserQueryPage queryPage) {
+        Page<User> page = new Page<>(queryPage.getPageNumber(), queryPage.getPageSize());
+        List<User> userList = userMapper.getUserList(page, queryPage);
+        page.setRecords(userList);
+        return PageUtils.wrap(page, UserInfoVo.class);
     }
 
     @Override
-    public CommonResult updateUser(User user) {
-        userMapper.updateUser(user);
-        userCacheService.setUser(user);
-        return CommonResult.success();
+    public Boolean updateUser(UserInfoVo userInfoVo) {
+        User user = userMapper.selectById(userInfoVo.getId());
+        if (user == null) {
+            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
+        }
+        BeanUtils.copyProperties(userInfoVo, user);
+        userMapper.updateById(user);
+        return true;
     }
 
     @Override
-    public CommonResult updateUserPassword(UsernamePasswordVo usernamePasswordVo) {
-        User user = userMapper.getUserByUserId(usernamePasswordVo.getId());
-        if (user != null) {
-            return CommonResult.failed(I18nMessage.USER_EXIST);
+    public Boolean updateUserPassword(UsernamePasswordVo usernamePasswordVo) {
+        User user = userMapper.selectById(usernamePasswordVo.getId());
+        if (user == null) {
+            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
         }
         String phone = usernamePasswordVo.getPhone();
         String phoneVerifyCode = usernamePasswordVo.getPhoneVerifyCode();
         if (!StringUtils.hasLength(phoneVerifyCode)) {
-            return CommonResult.failed(I18nMessage.VERIFY_CODE_NOTNULL);
+            throw new CommonException(GlobalResultVariables.VERIFY_CODE_ERROR);
         }
         String phoneVerifyCodeCache = userCacheService.getPhoneVerifyCode(phone);
         if (!StringUtils.hasLength(phoneVerifyCodeCache)) {
-            return CommonResult.failed(I18nMessage.VERIFY_CODE_EXPIRED);
+            throw new CommonException(GlobalResultVariables.VERIFY_CODE_OVERDUE);
         }
-        userMapper.updatePassword(usernamePasswordVo.getId(), passwordEncoder.encode(usernamePasswordVo.getPassword()));
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().set(User::getPassword, passwordEncoder.encode(usernamePasswordVo.getPassword())).eq(User::getId, user.getId());
+        userMapper.update(null, updateWrapper);
         userCacheService.deletePhoneVerifyCode(phone);
-        userCacheService.setUser(userMapper.getUserByUserId(usernamePasswordVo.getId()));
-        return CommonResult.success();
+        return true;
     }
 
     @Override
-    public CommonResult updateUserRole(UserRoleRelation userRoleRelation) {
-        if (userMapper.getUserByUserId(userRoleRelation.getUserId()) == null) {
-            return CommonResult.failed(I18nMessage.USER_NOT_EXIST);
+    @Transactional
+    public Boolean updateUserRole(UserRoleRelationVo userRoleRelationVo) {
+        User user = userMapper.selectById(userRoleRelationVo.getUserId());
+        if (user == null) {
+            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
         }
-        userRoleRelationMapper.deleteUserRoleRelationByRoleId(userRoleRelation.getUserId());
-        List<String> roleIds = userRoleRelation.getRoleIds();
-        if (CollectionUtils.isEmpty(roleIds)) {
-            roleIds.forEach(roleId -> {
-                UserRoleRelation urr = new UserRoleRelation();
-                urr.setId(CommonUtils.getUUID());
-                urr.setUserId(userRoleRelation.getUserId());
-                urr.setRoleId(roleId);
-                userRoleRelationMapper.addUserRoleRelation(urr);
-            });
+        QueryWrapper<UserRoleRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(UserRoleRelation::getUserId, userRoleRelationVo.getUserId());
+        userRoleRelationMapper.delete(queryWrapper);
+        List<String> roleIds = userRoleRelationVo.getRoleIds();
+        if (!CollectionUtils.isEmpty(roleIds)) {
+            for (String roleId : roleIds) {
+                UserRoleRelation userRoleRelation = new UserRoleRelation();
+                userRoleRelation.setId(CommonUtils.uuid());
+                userRoleRelation.setUserId(userRoleRelationVo.getUserId());
+                userRoleRelation.setRoleId(roleId);
+                userRoleRelationMapper.insert(userRoleRelation);
+            }
         }
-        return CommonResult.success();
+        return true;
     }
 
     @Override
-    public CommonResult deleteUser(String userId) {
-        userMapper.deleteUserByUserId(userId);
-        userRoleRelationMapper.deleteUserRoleRelationByUserId(userId);
-        userCacheService.deleteUserByUserId(userId);
-        return CommonResult.success();
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userMapper.getUserByUsername(username);
-        Set<UserGrantedAuthority> authorities = new HashSet<>();
-        List<RoleResourceRelation> roleResourceRelations = roleResourceRelationMapper.getRoleResourceRelations(user.getId());
-        for (RoleResourceRelation roleResourceRelation : roleResourceRelations) {
-            authorities.add(new UserGrantedAuthority(roleResourceRelation.getResourceId()));
-        }
-        CustomUserDetails customUserDetails = new CustomUserDetails(user);
-        customUserDetails.setAuthorities(authorities);
-        return customUserDetails;
+    @Transactional
+    public Boolean deleteUser(String id) {
+        userMapper.deleteById(id);
+        QueryWrapper<UserRoleRelation> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(UserRoleRelation::getUserId, id);
+        userRoleRelationMapper.delete(queryWrapper);
+        return true;
     }
 }

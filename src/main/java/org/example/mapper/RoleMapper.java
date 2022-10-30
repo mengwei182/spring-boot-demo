@@ -1,21 +1,12 @@
 package org.example.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.example.entity.Role;
 
 import java.util.List;
 
 @Mapper
-public interface RoleMapper {
-    void addRole(Role role);
-
-    void deleteRole(String id);
-
-    void updateRole(Role role);
-
+public interface RoleMapper extends BaseMapper<Role> {
     List<Role> getRolesByUserId(String userId);
-
-    List<Role> getAllRoleList();
-
-    Role getRoleByRoleId(String roleId);
 }

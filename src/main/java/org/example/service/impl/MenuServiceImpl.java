@@ -1,14 +1,21 @@
 package org.example.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.api.MenuQueryPage;
-import org.example.common.model.CommonResult;
-import org.example.common.model.Page;
-import org.example.common.util.PageUtils;
+import org.example.common.exception.CommonException;
+import org.example.common.global.GlobalResultVariables;
 import org.example.entity.Menu;
+import org.example.entity.RoleMenuRelation;
+import org.example.entity.vo.MenuVo;
 import org.example.mapper.MenuMapper;
 import org.example.mapper.RoleMenuRelationMapper;
 import org.example.service.MenuService;
+import org.example.util.CommonUtils;
+import org.example.util.PageUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -21,29 +28,44 @@ public class MenuServiceImpl implements MenuService {
     private RoleMenuRelationMapper roleMenuRelationMapper;
 
     @Override
-    public CommonResult addMenu(Menu menu) {
-        menuMapper.addMenu(menu);
-        return CommonResult.success();
+    public Boolean addMenu(MenuVo menuVo) {
+        Menu menu = new Menu();
+        BeanUtils.copyProperties(menuVo, menu);
+        menu.setId(CommonUtils.uuid());
+        menuMapper.insert(menu);
+        return true;
     }
 
     @Override
-    public CommonResult getMenuList(MenuQueryPage queryPage) {
-        List<Menu> menuList = menuMapper.getMenuList(queryPage);
-        Integer total = menuMapper.getMenuListCount(queryPage);
-        Page page = PageUtils.wrapper(queryPage, menuList, total);
-        return CommonResult.success(page);
+    public Page<MenuVo> getMenuList(MenuQueryPage queryPage) {
+        Page<Menu> page = new Page<>(queryPage.getPageNumber(), queryPage.getPageSize());
+        List<Menu> menuList = menuMapper.getMenuList(page, queryPage);
+        page.setRecords(menuList);
+        return PageUtils.wrap(page, MenuVo.class);
     }
 
     @Override
-    public CommonResult deleteMenu(String id) {
-        menuMapper.deleteMenu(id);
-        roleMenuRelationMapper.deleteRoleMenuRelationByMenuId(id);
-        return CommonResult.success();
+    @Transactional
+    public Boolean deleteMenu(String id) {
+        Menu menu = menuMapper.selectById(id);
+        if (menu == null) {
+            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
+        }
+        menuMapper.deleteById(id);
+        QueryWrapper<RoleMenuRelation> roleMenuRelationQueryWrapper = new QueryWrapper<>();
+        roleMenuRelationQueryWrapper.lambda().eq(RoleMenuRelation::getMenuId, id);
+        roleMenuRelationMapper.delete(roleMenuRelationQueryWrapper);
+        return true;
     }
 
     @Override
-    public CommonResult updateMenu(Menu menu) {
-        menuMapper.updateMenu(menu);
-        return CommonResult.success();
+    public Boolean updateMenu(MenuVo menuVo) {
+        Menu menu = menuMapper.selectById(menuVo.getId());
+        if (menu == null) {
+            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
+        }
+        BeanUtils.copyProperties(menuVo, menu);
+        menuMapper.updateById(menu);
+        return true;
     }
 }

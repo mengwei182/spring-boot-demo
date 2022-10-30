@@ -1,10 +1,9 @@
 package org.example.service;
 
-import org.example.common.model.CommonResult;
-import org.example.entity.ResourceCategory;
+import org.example.entity.vo.ResourceCategoryVo;
 
 public interface ResourceCategoryService {
-    CommonResult addResourceCategory(ResourceCategory resourceCategory);
+    Boolean addResourceCategory(ResourceCategoryVo resourceCategoryVo);
 
-    CommonResult updateResourceCategory(ResourceCategory resourceCategory);
+    Boolean updateResourceCategory(ResourceCategoryVo resourceCategoryVo);
 }

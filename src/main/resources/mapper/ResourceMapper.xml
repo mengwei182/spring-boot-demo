@@ -1,50 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.mapper.ResourceMapper">
-    <insert id="addResource" parameterType="org.example.entity.Resource">
-        INSERT INTO resource(id, name, url, description, category_id, enable)
-        VALUES (#{id}, #{name}, #{url}, #{description}, #{categoryId}, #{enable})
-    </insert>
-
-    <delete id="deleteResource" parameterType="java.lang.String">
-        DELETE
-        FROM resource
-        WHERE id = #{id}
-    </delete>
-
-    <update id="updateResource" parameterType="org.example.entity.Resource">
-        UPDATE resource
-        SET name = #{name}
-        WHERE id = #{id}
-    </update>
-
     <select id="getResourceList" parameterType="org.example.common.model.QueryPage" resultType="org.example.entity.Resource">
         SELECT *
         FROM resource
         <where>
-            <foreach collection="queryParamMap" index="key" item="value">
-                <if test="key.equals('name') and value != null">
-                    name LIKE #{value}
-                </if>
-            </foreach>
+            <if test="name != null and name != null">
+                name LIKE CONCAT('%', #{name}, '%')
+            </if>
         </where>
-        LIMIT #{offset}, #{rows}
-    </select>
-
-    <select id="getResourceListCount" parameterType="org.example.common.model.QueryPage" resultType="org.example.entity.Resource">
-        SELECT *
-        FROM resource
-        <where>
-            <foreach collection="queryParamMap" index="key" item="value">
-                <if test="key.equals('name') and value != null">
-                    name LIKE #{value}
-                </if>
-            </foreach>
-        </where>
-    </select>
-
-    <select id="getAllResourceList" resultType="org.example.entity.Resource">
-        SELECT *
-        FROM resource
     </select>
 </mapper>

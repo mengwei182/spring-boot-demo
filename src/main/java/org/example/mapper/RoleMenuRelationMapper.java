@@ -1,17 +1,9 @@
 package org.example.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.example.entity.RoleMenuRelation;
 
-import java.util.List;
-
 @Mapper
-public interface RoleMenuRelationMapper {
-    void addRoleMenuRelation(RoleMenuRelation roleMenuRelation);
-
-    List<RoleMenuRelation> getRoleMenuRelations(String userId);
-
-    void deleteRoleMenuRelationByRoleId(String userId);
-
-    void deleteRoleMenuRelationByMenuId(String menuId);
+public interface RoleMenuRelationMapper extends BaseMapper<RoleMenuRelation> {
 }

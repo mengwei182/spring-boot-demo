@@ -1,15 +1,14 @@
 package org.example.service;
 
-import org.example.common.model.CommonResult;
-import org.example.entity.Role;
-import org.example.entity.RoleMenuRelation;
+import org.example.entity.vo.RoleMenuRelationVo;
+import org.example.entity.vo.RoleVo;
 
 public interface RoleService {
-    CommonResult addRole(Role role);
+    Boolean addRole(RoleVo roleVo);
 
-    CommonResult deleteRole(String id);
+    Boolean deleteRole(String id);
 
-    CommonResult updateRole(Role role);
+    Boolean updateRole(RoleVo roleVo);
 
-    CommonResult updateRoleMenu(RoleMenuRelation roleMenuRelation);
+    Boolean updateRoleMenu(RoleMenuRelationVo roleMenuRelationVo);
 }

@@ -1,24 +1,27 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.Date;
 
+/**
+ * @author 李辉
+ * @since 2022/10/29
+ */
 @Data
-public class User {
-    // table column
-    private String id;
+@TableName("user")
+@EqualsAndHashCode(callSuper = true)
+public class User extends BaseEntity {
     private String username;
     private String password;
     private String icon;
-    private String email;
-    private String nickName;
-    private String note;
-    private Date loginTime;
-    private Boolean enable;
-    private Date createTime;
-    private Date updateTime;
-
-    // not table column
     private String phone;
+    private String email;
+    private String name;
+    private String description;
+    private Date loginTime;
+    // 0.禁用，1.正常，2.需要手机验证码，3.需要图形验证码，4.需要手机验证码和图像验证码
+    private Integer status;
 }

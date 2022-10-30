@@ -1,35 +1,39 @@
 package org.example.controller;
 
 import org.example.common.model.CommonResult;
-import org.example.entity.Role;
-import org.example.entity.RoleMenuRelation;
+import org.example.entity.vo.RoleMenuRelationVo;
+import org.example.entity.vo.RoleVo;
 import org.example.service.RoleService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 
 @RestController
+@RequestMapping("/role")
 public class RoleController {
     @Resource
     private RoleService roleService;
 
-    @RequestMapping(value = "/role", method = RequestMethod.POST, produces = "application/json", consumes = "application/json")
-    public CommonResult addRole(@RequestBody Role role) {
-        return roleService.addRole(role);
+    @RequestMapping("/add")
+    public CommonResult addRole(@RequestBody RoleVo roleVo) {
+        return CommonResult.success(roleService.addRole(roleVo));
     }
 
-    @RequestMapping(value = "/role", method = RequestMethod.DELETE, produces = "application/json", consumes = "application/json")
+    @RequestMapping("/delete")
     public CommonResult deleteRole(@RequestParam String id) {
-        return roleService.deleteRole(id);
+        return CommonResult.success(roleService.deleteRole(id));
     }
 
-    @RequestMapping(value = "/role", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-    public CommonResult updateRole(@RequestBody Role role) {
-        return roleService.updateRole(role);
+    @RequestMapping("/update")
+    public CommonResult updateRole(@RequestBody RoleVo roleVo) {
+        return CommonResult.success(roleService.updateRole(roleVo));
     }
 
-    @RequestMapping(value = "/menu/update", method = RequestMethod.PUT, produces = "application/json", consumes = "application/json")
-    public CommonResult updateRoleMenu(@RequestBody RoleMenuRelation roleMenuRelation) {
-        return roleService.updateRoleMenu(roleMenuRelation);
+    @RequestMapping("/menu/update")
+    public CommonResult updateRoleMenu(@RequestBody RoleMenuRelationVo roleMenuRelationVo) {
+        return CommonResult.success(roleService.updateRoleMenu(roleMenuRelationVo));
     }
 }

@@ -1,51 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.mapper.RoleMapper">
-    <insert id="addRole" parameterType="org.example.entity.Role">
-        INSERT INTO role(id, name, description, sort, enable)
-        VALUES (#{id}, #{name}, #{description}, #{sort}, #{enable})
-    </insert>
-
-    <delete id="deleteRole" parameterType="java.lang.String">
-        DELETE
-        FROM role
-        WHERE id = #{id}
-    </delete>
-
-    <update id="updateRole" parameterType="org.example.entity.Role">
-        UPDATE role
-        <set>
-            <if test="name != null">
-                name = #{name},
-            </if>
-            <if test="description != null">
-                description = #{description},
-            </if>
-            <if test="sort != null">
-                sort = #{sort},
-            </if>
-            <if test="enable != null">
-                enable = #{enable},
-            </if>
-        </set>
-        WHERE id = #{id}
-    </update>
-
     <select id="getRolesByUserId" parameterType="java.lang.String" resultType="org.example.entity.Role">
         SELECT r.*
         FROM role r
              LEFT JOIN user_role_relation urr ON r.id = urr.user_id
         WHERE urr.user_id = #{userId}
-    </select>
-
-    <select id="getAllRoleList" parameterType="org.example.entity.Role">
-        SELECT *
-        FROM role
-    </select>
-
-    <select id="getRoleByRoleId" parameterType="java.lang.String" resultType="org.example.entity.Role">
-        SELECT *
-        FROM role
-        WHERE id = #{id}
     </select>
 </mapper>

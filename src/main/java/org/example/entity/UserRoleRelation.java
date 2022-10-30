@@ -1,19 +1,17 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-import java.util.List;
-
+/**
+ * @author 李辉
+ * @since 2022/10/29
+ */
 @Data
-public class UserRoleRelation {
-    // table column
-    private String id;
+@TableName("user_role_relation")
+@EqualsAndHashCode(callSuper = true)
+public class UserRoleRelation extends BaseEntity {
     private String userId;
     private String roleId;
-    private Date createTime;
-    private Date updateTime;
-
-    // not table column
-    private List<String> roleIds;
 }

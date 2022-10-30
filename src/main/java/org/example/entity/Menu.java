@@ -1,20 +1,23 @@
 package org.example.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.Date;
-
+/**
+ * @author 李辉
+ * @since 2022/10/29
+ */
 @Data
-public class Menu {
-    // table column
-    private String id;
+@TableName("menu")
+@EqualsAndHashCode(callSuper = true)
+public class Menu extends BaseEntity {
+    private String name;
     private String parentId;
-    private String title;
+    private String idChain;
     private Integer level;
     private Integer sort;
-    private String name;
     private String icon;
-    private Boolean hidden;
-    private Date createTime;
-    private Date updateTime;
+    private Integer status;
+    private String description;
 }

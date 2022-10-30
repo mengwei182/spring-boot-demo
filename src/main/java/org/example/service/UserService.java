@@ -1,39 +1,34 @@
 package org.example.service;
 
-import org.example.common.model.CommonResult;
-import org.example.common.model.QueryPage;
-import org.example.entity.User;
-import org.example.entity.UserRoleRelation;
-import org.example.vo.UsernamePasswordVo;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.example.api.UserQueryPage;
+import org.example.entity.vo.UserInfoVo;
+import org.example.entity.vo.UserRoleRelationVo;
+import org.example.entity.vo.UsernamePasswordVo;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.Principal;
 
-public interface UserService extends UserDetailsService {
-    CommonResult login(UsernamePasswordVo usernamePasswordVo);
+public interface UserService {
+    String login(UsernamePasswordVo usernamePasswordVo);
 
-    CommonResult logout(HttpServletRequest request);
+    Boolean logout();
 
-    CommonResult register(User user);
+    Boolean register(UserInfoVo userInfoVo);
 
-    CommonResult getPhoneVerifyCode(String phone);
+    Boolean generatePhoneVerifyCode(String phone);
 
-    void getImageVerifyCode(HttpServletResponse response, String account) throws IOException;
+    void generateImageVerifyCode(HttpServletResponse response) throws IOException;
 
-    CommonResult getUserInfo(Principal principal);
+    UserInfoVo getUserInfo(String id);
 
-    CommonResult getUserInfoById(String userId);
+    Page<UserInfoVo> getUserList(UserQueryPage queryPage);
 
-    CommonResult getUserList(QueryPage queryPage);
+    Boolean updateUser(UserInfoVo userInfoVo);
 
-    CommonResult updateUser(User user);
+    Boolean updateUserPassword(UsernamePasswordVo usernamePasswordVo);
 
-    CommonResult updateUserPassword(UsernamePasswordVo usernamePasswordVo);
+    Boolean updateUserRole(UserRoleRelationVo userRoleRelationVo);
 
-    CommonResult updateUserRole(UserRoleRelation userRoleRelation);
-
-    CommonResult deleteUser(String userId);
+    Boolean deleteUser(String id);
 }

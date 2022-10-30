@@ -1,11 +1,9 @@
 package org.example.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.example.entity.ResourceCategory;
 
 @Mapper
-public interface ResourceCategoryMapper {
-    void addResourceCategory(ResourceCategory resourceCategory);
-
-    void updateResourceCategory(ResourceCategory resourceCategory);
+public interface ResourceCategoryMapper extends BaseMapper<ResourceCategory> {
 }

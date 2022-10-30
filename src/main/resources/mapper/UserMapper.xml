@@ -1,82 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.mapper.UserMapper">
-    <insert id="addUser" parameterType="org.example.entity.User">
-        INSERT INTO user(id, username, password, icon, email, nick_name, note)
-        VALUES (#{id}, #{username}, #{password}, #{icon}, #{email}, #{nickName}, #{note})
-    </insert>
-
-    <select id="getUserByUserId" parameterType="java.lang.String" resultType="org.example.entity.User">
-        SELECT *
-        FROM user
-        WHERE id = #{id}
-    </select>
-
-    <select id="getUserList" parameterType="org.example.common.model.QueryPage" resultType="org.example.entity.User">
+    <select id="getUserList" parameterType="org.example.api.UserQueryPage" resultType="org.example.entity.User">
         SELECT *
         FROM user
         <where>
-            <foreach collection="queryParamMap" index="key" item="value">
-                <if test="key.equals('username')">
-                    username LIKE #{value}
-                </if>
-            </foreach>
-        </where>
-        LIMIT #{offset}, #{rows}
-    </select>
-
-    <select id="getUserListCount" parameterType="org.example.common.model.QueryPage" resultType="org.example.entity.User">
-        SELECT *
-        FROM user
-        <where>
-            <foreach collection="queryParamMap" index="key" item="value">
-                <if test="key.equals('username') and value != null">
-                    username LIKE #{value}
-                </if>
-            </foreach>
+            <if test="queryPage.username != null and queryPage.username != ''">
+                username LIKE CONCAT('%', #{queryPage.username}, '%')
+            </if>
         </where>
     </select>
-
-    <select id="getUserByUsername" parameterType="java.lang.String" resultType="org.example.entity.User">
-        SELECT *
-        FROM user
-        WHERE username = #{username}
-    </select>
-
-    <update id="updateUser" parameterType="org.example.entity.User">
-        UPDATE user SET
-        <set>
-            <if test="nickName != null">
-                nick_name = #{nickName},
-            </if>
-            <if test="note != null">
-                note = #{note},
-            </if>
-        </set>
-        WHERE id = #{id}
-    </update>
-
-    <update id="updatePassword" parameterType="java.lang.String">
-        UPDATE user
-        SET password = #{password}
-        WHERE id = #{id}
-    </update>
-
-    <update id="updateEmail" parameterType="java.lang.String">
-        UPDATE user
-        SET email= #{email}
-        WHERE id = #{id}
-    </update>
-
-    <delete id="deleteUserByUserId" parameterType="java.lang.String">
-        DELETE
-        FROM user
-        WHERE id = #{id}
-    </delete>
-
-    <update id="updateLoginTime" parameterType="java.lang.Object">
-        UPDATE user
-        SET update_time = #{updateDate}
-        WHERE id = #{id}
-    </update>
 </mapper>
