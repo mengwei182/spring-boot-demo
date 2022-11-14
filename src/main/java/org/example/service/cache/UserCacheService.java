@@ -1,4 +1,4 @@
-package org.example.cache;
+package org.example.service.cache;
 
 public interface UserCacheService {
     void setPhoneVerifyCode(String phone, String verifyCode, Long timeout);

@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.api.MenuQueryPage;
 import org.example.common.exception.CommonException;
-import org.example.common.global.GlobalResultVariables;
 import org.example.entity.Menu;
 import org.example.entity.RoleMenuRelation;
 import org.example.entity.vo.MenuVo;
@@ -49,7 +48,7 @@ public class MenuServiceImpl implements MenuService {
     public Boolean deleteMenu(String id) {
         Menu menu = menuMapper.selectById(id);
         if (menu == null) {
-            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
+            throw new CommonException(CommonErrorResult.OBJECT_NOT_EXIST);
         }
         menuMapper.deleteById(id);
         QueryWrapper<RoleMenuRelation> roleMenuRelationQueryWrapper = new QueryWrapper<>();
@@ -62,7 +61,7 @@ public class MenuServiceImpl implements MenuService {
     public Boolean updateMenu(MenuVo menuVo) {
         Menu menu = menuMapper.selectById(menuVo.getId());
         if (menu == null) {
-            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
+            throw new CommonException(CommonErrorResult.OBJECT_NOT_EXIST);
         }
         BeanUtils.copyProperties(menuVo, menu);
         menuMapper.updateById(menu);

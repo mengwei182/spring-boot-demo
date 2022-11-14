@@ -1,12 +1,12 @@
 package org.example.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.common.exception.CommonException;
-import org.example.common.global.GlobalResultVariables;
-import org.example.common.usercontext.UserContext;
 import org.example.entity.vo.TokenVo;
 import org.example.entity.vo.UserInfoVo;
+import org.example.error.CommonErrorResult;
+import org.example.error.exception.CommonException;
 import org.example.properties.ConfigProperties;
+import org.example.usercontext.UserContext;
 import org.example.util.TokenUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.Order;
@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * UserContext拦截器
  *
- * @author 李辉
+ * @author lihui
  * @since 2022/10/26
  */
 @Slf4j
@@ -50,7 +50,7 @@ public class UserContextInterceptor implements HandlerInterceptor {
                 }
             }
         } else {
-            throw new CommonException(GlobalResultVariables.UNAUTHORIZED);
+            throw new CommonException(CommonErrorResult.UNAUTHORIZED);
         }
         String cookie = request.getHeader("Cookie");
         TokenVo<UserInfoVo> tokenVo = TokenUtil.unsigned(cookie, UserInfoVo.class);

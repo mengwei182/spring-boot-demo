@@ -1,10 +1,10 @@
-package org.example.cache.impl;
+package org.example.service.cache.impl;
 
-import org.example.cache.ResourceCacheService;
 import org.example.entity.Resource;
 import org.example.mapper.ResourceMapper;
-import org.example.redis.RedisService;
+import org.example.service.cache.ResourceCacheService;
 import org.example.util.CommonUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -19,7 +19,7 @@ import java.util.Set;
 @Service
 public class ResourceCacheServiceImpl implements ResourceCacheService {
     @javax.annotation.Resource
-    private RedisService redisService;
+    private RedisTemplate<Object, Object> redisTemplate;
     @javax.annotation.Resource
     private ResourceMapper resourceMapper;
     private static final String RESOURCE_CACHE = "RESOURCE_CACHE";
@@ -27,20 +27,20 @@ public class ResourceCacheServiceImpl implements ResourceCacheService {
     @Override
     public List<Resource> getResources() {
         List<Resource> resources = new ArrayList<>();
-        Set<Object> members = redisService.getSetOperations().members(RESOURCE_CACHE);
+        Set<Object> members = redisTemplate.opsForSet().members(RESOURCE_CACHE);
         if (!CollectionUtils.isEmpty(members)) {
             for (Object member : members) {
                 resources.add(CommonUtils.gson().fromJson(CommonUtils.gson().toJson(member), Resource.class));
             }
         } else {
             resources = resourceMapper.selectList(null);
-            redisService.getSetOperations().add(RESOURCE_CACHE, resources.toArray());
+            redisTemplate.opsForSet().add(RESOURCE_CACHE, resources.toArray());
         }
         return resources;
     }
 
     @Override
     public void setResource(List<Resource> resources) {
-        redisService.getSetOperations().add(RESOURCE_CACHE, resources.toArray());
+        redisTemplate.opsForSet().add(RESOURCE_CACHE, resources.toArray());
     }
 }

@@ -1,4 +1,4 @@
-package org.example.common.global;
+package org.example.global;
 
 public interface StaticVariables {
     String ACCESS_CONTROL_ALLOW_ORIGIN_HEADER = "Access-Control-Allow-Origin";

@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.common.model.CommonResult;
+import org.example.model.CommonResult;
 import org.example.entity.vo.ResourceCategoryVo;
 import org.example.service.ResourceCategoryService;
 import org.springframework.web.bind.annotation.RequestBody;

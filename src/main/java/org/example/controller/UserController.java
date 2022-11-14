@@ -1,8 +1,8 @@
 package org.example.controller;
 
 import org.example.api.UserQueryPage;
-import org.example.common.model.CommonResult;
-import org.example.common.usercontext.UserContext;
+import org.example.model.CommonResult;
+import org.example.usercontext.UserContext;
 import org.example.entity.vo.UserInfoVo;
 import org.example.entity.vo.UserRoleRelationVo;
 import org.example.entity.vo.UsernamePasswordVo;

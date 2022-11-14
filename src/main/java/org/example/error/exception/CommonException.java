@@ -1,9 +1,9 @@
-package org.example.common.exception;
+package org.example.error.exception;
 
 import java.io.Serializable;
 
 /**
- * @author 李辉
+ * @author lihui
  * @since 2022/10/26
  */
 public class CommonException extends RuntimeException implements Serializable {

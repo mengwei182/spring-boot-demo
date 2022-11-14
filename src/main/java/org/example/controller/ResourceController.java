@@ -1,7 +1,7 @@
 package org.example.controller;
 
 import org.example.api.ResourceQueryPage;
-import org.example.common.model.CommonResult;
+import org.example.model.CommonResult;
 import org.example.entity.vo.ResourceVo;
 import org.example.service.ResourceService;
 import org.springframework.web.bind.annotation.*;

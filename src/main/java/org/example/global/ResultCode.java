@@ -1,4 +1,4 @@
-package org.example.common.global;
+package org.example.global;
 
 public enum ResultCode {
     SUCCESS(200, "SUCCESS"),

@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import org.example.entity.BaseEntity;
 
 /**
- * @author 李辉
+ * @author lihui
  * @since 2022/10/29
  */
 @Data

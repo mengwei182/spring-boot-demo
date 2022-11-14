@@ -2,7 +2,6 @@ package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.common.exception.CommonException;
-import org.example.common.global.GlobalResultVariables;
 import org.example.entity.Role;
 import org.example.entity.RoleMenuRelation;
 import org.example.entity.UserRoleRelation;
@@ -44,7 +43,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean deleteRole(String id) {
         Role role = roleMapper.selectById(id);
         if (role == null) {
-            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
+            throw new CommonException(CommonErrorResult.OBJECT_NOT_EXIST);
         }
         roleMapper.deleteById(id);
         QueryWrapper<UserRoleRelation> userRoleRelationQueryWrapper = new QueryWrapper<>();
@@ -60,7 +59,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean updateRole(RoleVo roleVo) {
         Role role = roleMapper.selectById(roleVo.getId());
         if (role == null) {
-            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
+            throw new CommonException(CommonErrorResult.OBJECT_NOT_EXIST);
         }
         role = new Role();
         BeanUtils.copyProperties(roleVo, role);
@@ -72,7 +71,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean updateRoleMenu(RoleMenuRelationVo roleMenuRelationVo) {
         Role role = roleMapper.selectById(roleMenuRelationVo.getRoleId());
         if (role == null) {
-            throw new CommonException(GlobalResultVariables.OBJECT_NOT_EXIST);
+            throw new CommonException(CommonErrorResult.OBJECT_NOT_EXIST);
         }
         QueryWrapper<RoleMenuRelation> roleMenuRelationQueryWrapper = new QueryWrapper<>();
         roleMenuRelationQueryWrapper.lambda().eq(RoleMenuRelation::getRoleId, roleMenuRelationVo.getRoleId());

@@ -1,4 +1,4 @@
-package org.example.cache;
+package org.example.service.cache;
 
 import org.example.entity.Resource;
 

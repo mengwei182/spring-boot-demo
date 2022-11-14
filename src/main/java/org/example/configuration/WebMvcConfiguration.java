@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import javax.annotation.Resource;
 
 /**
- * @author 李辉
+ * @author lihui
  * @since 2022/10/26
  */
 @Configuration

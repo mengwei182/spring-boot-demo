@@ -1,4 +1,4 @@
-package org.example.common.usercontext;
+package org.example.usercontext;
 
 import lombok.Data;
 import org.example.entity.vo.UserInfoVo;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author 李辉
+ * @author lihui
  * @since 2022/10/26
  */
 @Data

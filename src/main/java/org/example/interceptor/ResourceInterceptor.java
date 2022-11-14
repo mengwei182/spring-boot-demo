@@ -1,15 +1,15 @@
 package org.example.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.cache.ResourceCacheService;
-import org.example.cache.RoleCacheService;
-import org.example.cache.RoleResourceRelationCacheService;
-import org.example.common.exception.CommonException;
-import org.example.common.global.GlobalResultVariables;
 import org.example.entity.Role;
 import org.example.entity.RoleResourceRelation;
 import org.example.entity.vo.TokenVo;
+import org.example.error.CommonErrorResult;
+import org.example.error.exception.CommonException;
 import org.example.properties.ConfigProperties;
+import org.example.service.cache.ResourceCacheService;
+import org.example.service.cache.RoleCacheService;
+import org.example.service.cache.RoleResourceRelationCacheService;
 import org.example.util.TokenUtil;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.Order;
@@ -61,7 +61,7 @@ public class ResourceInterceptor implements HandlerInterceptor {
                 }
             }
         } else {
-            throw new CommonException(GlobalResultVariables.UNAUTHORIZED);
+            throw new CommonException(CommonErrorResult.UNAUTHORIZED);
         }
         String cookie = request.getHeader("Cookie");
         TokenVo<?> tokenVo = TokenUtil.unsigned(cookie);
@@ -81,7 +81,7 @@ public class ResourceInterceptor implements HandlerInterceptor {
                 }
             }
         }
-        throw new CommonException(GlobalResultVariables.UNAUTHORIZED);
+        throw new CommonException(CommonErrorResult.UNAUTHORIZED);
     }
 
     @Override

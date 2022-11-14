@@ -13,7 +13,7 @@ import java.util.Base64;
 /**
  * token工具类
  *
- * @author 李辉
+ * @author lihui
  * @since 2022/10/25
  */
 @Slf4j

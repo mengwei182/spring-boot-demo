@@ -2,7 +2,6 @@ package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.example.common.exception.CommonException;
-import org.example.common.global.GlobalResultVariables;
 import org.example.entity.ResourceCategory;
 import org.example.entity.vo.ResourceCategoryVo;
 import org.example.mapper.ResourceCategoryMapper;
@@ -24,7 +23,7 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
         queryWrapper.lambda().eq(ResourceCategory::getName, resourceCategoryVo.getName());
         ResourceCategory resourceCategory = resourceCategoryMapper.selectOne(queryWrapper);
         if (resourceCategory != null) {
-            throw new CommonException(GlobalResultVariables.CATEGORY_EXIST);
+            throw new CommonException(CommonErrorResult.CATEGORY_EXIST);
         }
         resourceCategory = new ResourceCategory();
         BeanUtils.copyProperties(resourceCategoryVo, resourceCategory);

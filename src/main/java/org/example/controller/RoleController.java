@@ -1,6 +1,6 @@
 package org.example.controller;
 
-import org.example.common.model.CommonResult;
+import org.example.model.CommonResult;
 import org.example.entity.vo.RoleMenuRelationVo;
 import org.example.entity.vo.RoleVo;
 import org.example.service.RoleService;

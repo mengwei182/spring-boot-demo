@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * @author 李辉
+ * @author lihui
  * @since 2022/10/29
  */
 @Data

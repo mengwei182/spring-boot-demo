@@ -2,7 +2,7 @@ package org.example.api;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.example.common.model.QueryPage;
+import org.example.model.QueryPage;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

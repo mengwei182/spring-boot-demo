@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.example.api.UserQueryPage;
-import org.example.cache.UserCacheService;
-import org.example.common.exception.CommonException;
-import org.example.common.global.GlobalResultVariables;
-import org.example.common.usercontext.UserContext;
+import org.example.common.util.TokenUtil;
 import org.example.entity.Menu;
 import org.example.entity.Role;
 import org.example.entity.User;
@@ -17,9 +14,16 @@ import org.example.entity.vo.TokenVo;
 import org.example.entity.vo.UserInfoVo;
 import org.example.entity.vo.UserRoleRelationVo;
 import org.example.entity.vo.UsernamePasswordVo;
+import org.example.error.UserServerErrorResult;
+import org.example.error.exception.CommonException;
 import org.example.mapper.*;
 import org.example.service.UserService;
-import org.example.util.*;
+import org.example.service.cache.UserCacheService;
+import org.example.usercontext.UserContext;
+import org.example.util.CommonUtils;
+import org.example.util.ImageVerifyCodeUtils;
+import org.example.util.MessageUtils;
+import org.example.util.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,19 +61,19 @@ public class UserServiceImpl implements UserService {
         String username = usernamePasswordVo.getUsername();
         String password = usernamePasswordVo.getPassword();
         if (!StringUtils.hasLength(username)) {
-            throw new CommonException(GlobalResultVariables.USERNAME_NULL);
+            throw new CommonException(UserServerErrorResult.USERNAME_NULL);
         }
         if (!StringUtils.hasLength(password)) {
-            throw new CommonException(GlobalResultVariables.PASSWORD_NULL);
+            throw new CommonException(UserServerErrorResult.PASSWORD_NULL);
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getUsername, username);
         User user = userMapper.selectOne(queryWrapper);
         if (user == null) {
-            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
+            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
         }
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new CommonException(GlobalResultVariables.PASSWORD_ERROR);
+            throw new CommonException(UserServerErrorResult.PASSWORD_ERROR);
         }
         Date loginTime = new Date();
         UserInfoVo userInfoVo = buildUserVo(user);
@@ -92,16 +96,16 @@ public class UserServiceImpl implements UserService {
         String username = userInfoVo.getUsername();
         String password = userInfoVo.getPassword();
         if (!StringUtils.hasLength(username)) {
-            throw new CommonException(GlobalResultVariables.USERNAME_NULL);
+            throw new CommonException(UserServerErrorResult.USERNAME_NULL);
         }
         if (!StringUtils.hasLength(password)) {
-            throw new CommonException(GlobalResultVariables.PASSWORD_NULL);
+            throw new CommonException(UserServerErrorResult.PASSWORD_NULL);
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getUsername, username);
         User user = userMapper.selectOne(queryWrapper);
         if (user != null) {
-            throw new CommonException(GlobalResultVariables.USER_EXIST);
+            throw new CommonException(UserServerErrorResult.USER_EXIST);
         }
         user = new User();
         BeanUtils.copyProperties(userInfoVo, user);
@@ -142,7 +146,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserInfoVo getUserInfo(String id) {
         if (!StringUtils.hasLength(id)) {
-            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
+            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
         }
         User user = userMapper.selectById(id);
         return buildUserVo(user);
@@ -170,7 +174,7 @@ public class UserServiceImpl implements UserService {
     public Boolean updateUser(UserInfoVo userInfoVo) {
         User user = userMapper.selectById(userInfoVo.getId());
         if (user == null) {
-            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
+            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
         }
         BeanUtils.copyProperties(userInfoVo, user);
         userMapper.updateById(user);
@@ -181,16 +185,16 @@ public class UserServiceImpl implements UserService {
     public Boolean updateUserPassword(UsernamePasswordVo usernamePasswordVo) {
         User user = userMapper.selectById(usernamePasswordVo.getId());
         if (user == null) {
-            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
+            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
         }
         String phone = usernamePasswordVo.getPhone();
         String phoneVerifyCode = usernamePasswordVo.getPhoneVerifyCode();
         if (!StringUtils.hasLength(phoneVerifyCode)) {
-            throw new CommonException(GlobalResultVariables.VERIFY_CODE_ERROR);
+            throw new CommonException(UserServerErrorResult.VERIFY_CODE_ERROR);
         }
         String phoneVerifyCodeCache = userCacheService.getPhoneVerifyCode(phone);
         if (!StringUtils.hasLength(phoneVerifyCodeCache)) {
-            throw new CommonException(GlobalResultVariables.VERIFY_CODE_OVERDUE);
+            throw new CommonException(UserServerErrorResult.VERIFY_CODE_OVERDUE);
         }
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().set(User::getPassword, passwordEncoder.encode(usernamePasswordVo.getPassword())).eq(User::getId, user.getId());
@@ -204,7 +208,7 @@ public class UserServiceImpl implements UserService {
     public Boolean updateUserRole(UserRoleRelationVo userRoleRelationVo) {
         User user = userMapper.selectById(userRoleRelationVo.getUserId());
         if (user == null) {
-            throw new CommonException(GlobalResultVariables.USER_NOT_EXIST);
+            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
         }
         QueryWrapper<UserRoleRelation> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(UserRoleRelation::getUserId, userRoleRelationVo.getUserId());

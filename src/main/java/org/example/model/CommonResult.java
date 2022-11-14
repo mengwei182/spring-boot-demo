@@ -1,7 +1,7 @@
-package org.example.common.model;
+package org.example.model;
 
 import lombok.Data;
-import org.example.common.global.ResultCode;
+import org.example.global.ResultCode;
 
 @Data
 public class CommonResult {
