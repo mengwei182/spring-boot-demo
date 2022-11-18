@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 @PropertySource("classpath:common.properties")
 public class ConfigProperties {
-   @Value("${no.auth.path}")
-   private String noAuthUrls;
+    @Value("${no.auth.path}")
+    private String noAuthUrls;
 }

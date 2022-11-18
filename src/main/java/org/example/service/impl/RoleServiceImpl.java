@@ -1,12 +1,13 @@
 package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import org.example.common.exception.CommonException;
 import org.example.entity.Role;
 import org.example.entity.RoleMenuRelation;
 import org.example.entity.UserRoleRelation;
 import org.example.entity.vo.RoleMenuRelationVo;
 import org.example.entity.vo.RoleVo;
+import org.example.error.CommonErrorResult;
+import org.example.error.exception.CommonException;
 import org.example.mapper.RoleMapper;
 import org.example.mapper.RoleMenuRelationMapper;
 import org.example.mapper.UserRoleRelationMapper;

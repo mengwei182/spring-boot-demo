@@ -1,12 +1,12 @@
 package org.example.controller;
 
 import org.example.api.UserQueryPage;
-import org.example.model.CommonResult;
-import org.example.usercontext.UserContext;
 import org.example.entity.vo.UserInfoVo;
 import org.example.entity.vo.UserRoleRelationVo;
 import org.example.entity.vo.UsernamePasswordVo;
+import org.example.model.CommonResult;
 import org.example.service.UserService;
+import org.example.usercontext.UserContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

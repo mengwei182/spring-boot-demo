@@ -1,8 +1,8 @@
 package org.example.controller;
 
 import org.example.api.MenuQueryPage;
-import org.example.model.CommonResult;
 import org.example.entity.vo.MenuVo;
+import org.example.model.CommonResult;
 import org.example.service.MenuService;
 import org.springframework.web.bind.annotation.*;
 

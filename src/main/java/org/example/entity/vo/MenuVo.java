@@ -1,6 +1,5 @@
 package org.example.entity.vo;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.BaseEntity;

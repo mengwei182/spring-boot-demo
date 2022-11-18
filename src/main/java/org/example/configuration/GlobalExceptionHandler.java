@@ -1,6 +1,7 @@
 package org.example.configuration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.model.CommonResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

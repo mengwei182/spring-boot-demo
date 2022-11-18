@@ -1,8 +1,8 @@
 package org.example.controller;
 
-import org.example.model.CommonResult;
 import org.example.entity.vo.RoleMenuRelationVo;
 import org.example.entity.vo.RoleVo;
+import org.example.model.CommonResult;
 import org.example.service.RoleService;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

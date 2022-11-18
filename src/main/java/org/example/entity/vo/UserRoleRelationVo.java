@@ -15,6 +15,6 @@ import java.util.List;
 public class UserRoleRelationVo extends BaseEntity {
     private String userId;
     private String roleId;
-    List<String> userIds;
-    List<String> roleIds;
+    private List<String> userIds;
+    private List<String> roleIds;
 }
