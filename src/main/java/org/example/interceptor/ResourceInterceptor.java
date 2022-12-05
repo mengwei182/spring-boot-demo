@@ -51,12 +51,13 @@ public class ResourceInterceptor implements HandlerInterceptor {
             response.setStatus(HttpServletResponse.SC_OK);
             return true;
         }
+        AntPathMatcher antPathMatcher = new AntPathMatcher();
         String servletPath = request.getServletPath();
         if (StringUtils.hasLength(servletPath)) {
             // 校验是否是不需要验证token的url
             String[] noAuthUrls = configProperties.getNoAuthUrls().split(",");
             for (String noAuthUrl : noAuthUrls) {
-                if (servletPath.startsWith(noAuthUrl)) {
+                if (antPathMatcher.match(noAuthUrl, servletPath)) {
                     return true;
                 }
             }
@@ -71,7 +72,6 @@ public class ResourceInterceptor implements HandlerInterceptor {
         List<org.example.entity.Resource> resources = resourceCacheService.getResources();
         Map<String, org.example.entity.Resource> ResourceMap = resources.stream().collect(Collectors.toMap(org.example.entity.Resource::getId, o -> o));
         List<RoleResourceRelation> roleResourceRelations = roleResourceRelationCacheService.getRoleResourceRelations();
-        AntPathMatcher antPathMatcher = new AntPathMatcher();
         for (RoleResourceRelation roleResourceRelation : roleResourceRelations) {
             Role role = roleMap.get(roleResourceRelation.getRoleId());
             if (role != null) {
