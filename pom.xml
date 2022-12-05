@@ -24,10 +24,10 @@
         <lombok.version>1.18.24</lombok.version>
         <jackson.version>2.13.4</jackson.version>
         <spring.kafka.version>2.9.2</spring.kafka.version>
-        <spring.boot.starter.version>2.7.5</spring.boot.starter.version>
-        <druid.spring.boot.starter.version>1.2.14</druid.spring.boot.starter.version>
+        <spring.boot.starter.version>3.0.0</spring.boot.starter.version>
+        <druid.spring.boot.starter.version>1.2.15</druid.spring.boot.starter.version>
         <mybatis.plus.boot.starter.version>3.5.2</mybatis.plus.boot.starter.version>
-        <mybatis.spring.boot.starter.version>2.2.2</mybatis.spring.boot.starter.version>
+        <mybatis.spring.boot.starter.version>3.0.0</mybatis.spring.boot.starter.version>
     </properties>
 
     <dependencies>
