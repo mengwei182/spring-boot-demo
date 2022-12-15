@@ -14,7 +14,6 @@ import lombok.EqualsAndHashCode;
 public class Menu extends BaseEntity {
     private String name;
     private String parentId;
-    private String idChain;
     private Integer level;
     private Integer sort;
     private String icon;

@@ -13,7 +13,6 @@ import org.example.entity.BaseEntity;
 public class MenuVo extends BaseEntity {
     private String name;
     private String parentId;
-    private String idChain;
     private Integer level;
     private Integer sort;
     private String icon;
