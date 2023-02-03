@@ -44,7 +44,7 @@ public class TokenUtil {
      * @param tokenVo
      * @return
      */
-    public static String sign(TokenVo tokenVo) {
+    public static String sign(TokenVo<?> tokenVo) {
         try {
             byte[] bytes = encryptCipher.doFinal(CommonUtils.gson().toJson(tokenVo).getBytes());
             return Base64.getEncoder().encodeToString(bytes);
@@ -74,6 +74,8 @@ public class TokenUtil {
      * 解析token
      *
      * @param token
+     * @param clazz
+     * @param <T>
      * @return
      */
     public static <T> TokenVo<T> unsigned(String token, Class<T> clazz) {
