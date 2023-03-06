@@ -70,12 +70,12 @@ public class ResourceInterceptor implements HandlerInterceptor {
         List<Role> roles = roleCacheService.getRoleByUserId(userId);
         Map<String, Role> roleMap = roles.stream().collect(Collectors.toMap(Role::getId, o -> o));
         List<org.example.entity.Resource> resources = resourceCacheService.getResources();
-        Map<String, org.example.entity.Resource> ResourceMap = resources.stream().collect(Collectors.toMap(org.example.entity.Resource::getId, o -> o));
+        Map<String, org.example.entity.Resource> resourceMap = resources.stream().collect(Collectors.toMap(org.example.entity.Resource::getId, o -> o));
         List<RoleResourceRelation> roleResourceRelations = roleResourceRelationCacheService.getRoleResourceRelations();
         for (RoleResourceRelation roleResourceRelation : roleResourceRelations) {
             Role role = roleMap.get(roleResourceRelation.getRoleId());
             if (role != null) {
-                org.example.entity.Resource resource = ResourceMap.get(roleResourceRelation.getResourceId());
+                org.example.entity.Resource resource = resourceMap.get(roleResourceRelation.getResourceId());
                 if (antPathMatcher.match(resource.getUrl(), servletPath)) {
                     return true;
                 }
