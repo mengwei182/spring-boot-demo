@@ -11,7 +11,6 @@ import org.example.service.cache.ResourceCacheService;
 import org.example.service.cache.RoleCacheService;
 import org.example.service.cache.RoleResourceRelationCacheService;
 import org.example.util.TokenUtil;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -45,7 +44,7 @@ public class ResourceInterceptor implements HandlerInterceptor {
     private RoleResourceRelationCacheService roleResourceRelationCacheService;
 
     @Override
-    public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 简单请求直接放行
         if (HttpMethod.OPTIONS.toString().equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
@@ -85,10 +84,10 @@ public class ResourceInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) throws Exception {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
     }
 
     @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
     }
 }

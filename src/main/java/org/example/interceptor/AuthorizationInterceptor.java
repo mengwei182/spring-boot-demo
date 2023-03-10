@@ -6,7 +6,6 @@ import org.example.error.CommonErrorResult;
 import org.example.error.exception.CommonException;
 import org.example.properties.ConfigProperties;
 import org.example.util.TokenUtil;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -18,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -34,7 +34,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     private ConfigProperties configProperties;
 
     @Override
-    public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 简单请求直接放行
         if (HttpMethod.OPTIONS.toString().equalsIgnoreCase(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
