@@ -12,6 +12,8 @@ import lombok.EqualsAndHashCode;
 @TableName("role_resource_relation")
 @EqualsAndHashCode(callSuper = true)
 public class RoleResourceRelation extends BaseEntity {
+    // 角色id
     private String roleId;
+    // 资源id
     private String resourceId;
 }

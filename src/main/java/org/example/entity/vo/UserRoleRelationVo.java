@@ -2,7 +2,7 @@ package org.example.entity.vo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.example.entity.BaseEntity;
+import org.example.common.entity.BaseEntity;
 
 import java.util.List;
 
@@ -13,8 +13,12 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UserRoleRelationVo extends BaseEntity {
+    // 用户id
     private String userId;
+    // 角色id
     private String roleId;
+    // 用户id集合
     private List<String> userIds;
+    // 角色id集合
     private List<String> roleIds;
 }

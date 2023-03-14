@@ -6,11 +6,11 @@ import org.example.entity.RoleResourceRelation;
 import org.example.entity.vo.TokenVo;
 import org.example.error.CommonErrorResult;
 import org.example.error.exception.CommonException;
-import org.example.properties.ConfigProperties;
+import org.example.properties.CommonProperties;
 import org.example.service.cache.ResourceCacheService;
 import org.example.service.cache.RoleCacheService;
 import org.example.service.cache.RoleResourceRelationCacheService;
-import org.example.util.TokenUtil;
+import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Component
 public class ResourceInterceptor implements HandlerInterceptor {
     @Resource
-    private ConfigProperties configProperties;
+    private CommonProperties commonProperties;
     @Resource
     private RoleCacheService roleCacheService;
     @Resource
@@ -54,7 +54,7 @@ public class ResourceInterceptor implements HandlerInterceptor {
         String servletPath = request.getServletPath();
         if (StringUtils.hasLength(servletPath)) {
             // 校验是否是不需要验证token的url
-            String[] noAuthUrls = configProperties.getNoAuthUrls().split(",");
+            String[] noAuthUrls = commonProperties.getNoAuthUrls().split(",");
             for (String noAuthUrl : noAuthUrls) {
                 if (antPathMatcher.match(noAuthUrl, servletPath)) {
                     return true;
@@ -64,7 +64,7 @@ public class ResourceInterceptor implements HandlerInterceptor {
             throw new CommonException(CommonErrorResult.UNAUTHORIZED);
         }
         String cookie = request.getHeader("Cookie");
-        TokenVo<?> tokenVo = TokenUtil.unsigned(cookie);
+        TokenVo<?> tokenVo = TokenUtils.unsigned(cookie);
         String userId = (String) tokenVo.getId();
         List<Role> roles = roleCacheService.getRoleByUserId(userId);
         Map<String, Role> roleMap = roles.stream().collect(Collectors.toMap(Role::getId, o -> o));

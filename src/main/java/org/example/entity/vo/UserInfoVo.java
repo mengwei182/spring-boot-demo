@@ -3,12 +3,9 @@ package org.example.entity.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.BaseEntity;
-import org.example.entity.Menu;
-import org.example.entity.Role;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author lihui
@@ -17,17 +14,24 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UserInfoVo extends BaseEntity {
+    // 用户名
     @NotNull(message = "用户名不能为空")
     private String username;
+    // 密码
     @NotNull(message = "密码不能为空")
     private String password;
+    // 头像
     private String icon;
+    // 手机号
     private String phone;
+    // 邮箱
     private String email;
+    // 姓名
     private String name;
+    // 描述
     private String description;
+    // 登录时间
     private Date loginTime;
+    // 0禁用，1正常，2需要手机验证码，3需要图形验证码，4需要手机验证码和图像验证码
     private Integer status;
-    private List<Role> roles;
-    private List<Menu> menus;
 }

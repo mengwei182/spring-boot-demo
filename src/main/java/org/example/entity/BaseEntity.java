@@ -19,6 +19,6 @@ public abstract class BaseEntity {
     private String updateId;
     private Date createTime;
     private Date updateTime;
-    // 是否删除：0.未删除，1.已删除
+    // 是否删除：0未删除，1已删除
     private Integer deleted;
 }

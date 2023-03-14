@@ -4,8 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.entity.vo.TokenVo;
 import org.example.error.CommonErrorResult;
 import org.example.error.exception.CommonException;
-import org.example.properties.ConfigProperties;
-import org.example.util.TokenUtil;
+import org.example.properties.CommonProperties;
+import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ import java.util.Date;
 @Component
 public class AuthorizationInterceptor implements HandlerInterceptor {
     @Resource
-    private ConfigProperties configProperties;
+    private CommonProperties commonProperties;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -44,7 +44,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         if (StringUtils.hasLength(servletPath)) {
             // 校验是否是不需要验证token的url
             AntPathMatcher antPathMatcher = new AntPathMatcher();
-            String[] noAuthUrls = configProperties.getNoAuthUrls().split(",");
+            String[] noAuthUrls = commonProperties.getNoAuthUrls().split(",");
             for (String noAuthUrl : noAuthUrls) {
                 if (antPathMatcher.match(noAuthUrl, servletPath)) {
                     return true;
@@ -55,7 +55,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         }
         String cookie = request.getHeader("Cookie");
         if (StringUtils.hasLength(cookie)) {
-            TokenVo<?> tokenVo = TokenUtil.unsigned(cookie);
+            TokenVo<?> tokenVo = TokenUtils.unsigned(cookie);
             if (tokenVo != null) {
                 // 校验token有效时间
                 if (tokenVo.getSignTime().getTime() + tokenVo.getExpiration() * 1000 < new Date().getTime()) {

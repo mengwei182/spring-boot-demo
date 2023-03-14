@@ -5,9 +5,9 @@ import org.example.entity.vo.TokenVo;
 import org.example.entity.vo.UserInfoVo;
 import org.example.error.CommonErrorResult;
 import org.example.error.exception.CommonException;
-import org.example.properties.ConfigProperties;
+import org.example.properties.CommonProperties;
 import org.example.usercontext.UserContext;
-import org.example.util.TokenUtil;
+import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 public class UserContextInterceptor implements HandlerInterceptor {
     @Resource
-    private ConfigProperties configProperties;
+    private CommonProperties commonProperties;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -44,7 +44,7 @@ public class UserContextInterceptor implements HandlerInterceptor {
         if (StringUtils.hasLength(servletPath)) {
             // 校验是否是不需要验证token的url
             AntPathMatcher antPathMatcher = new AntPathMatcher();
-            String[] noAuthUrls = configProperties.getNoAuthUrls().split(",");
+            String[] noAuthUrls = commonProperties.getNoAuthUrls().split(",");
             for (String noAuthUrl : noAuthUrls) {
                 if (antPathMatcher.match(noAuthUrl, servletPath)) {
                     return true;
@@ -54,7 +54,7 @@ public class UserContextInterceptor implements HandlerInterceptor {
             throw new CommonException(CommonErrorResult.UNAUTHORIZED);
         }
         String cookie = request.getHeader("Cookie");
-        TokenVo<UserInfoVo> tokenVo = TokenUtil.unsigned(cookie, UserInfoVo.class);
+        TokenVo<UserInfoVo> tokenVo = TokenUtils.unsigned(cookie, UserInfoVo.class);
         // 经过AuthorizationInterceptor拦截器处理后，token不会为null
         UserInfoVo userInfoVo = tokenVo.getData();
         UserContext.set(userInfoVo.getId(), userInfoVo.getUsername(), userInfoVo);

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @PropertySource("classpath:common.properties")
-public class ConfigProperties {
-    @Value("${no.auth.path}")
-    private String noAuthUrls;
+public class CommonProperties {
+    @Value("${url.white.list}")
+    private String urlWhiteList;
 }

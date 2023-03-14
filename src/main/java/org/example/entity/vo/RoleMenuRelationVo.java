@@ -3,7 +3,7 @@ package org.example.entity.vo;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.example.entity.BaseEntity;
+import org.example.common.entity.BaseEntity;
 
 import java.util.List;
 
@@ -15,8 +15,12 @@ import java.util.List;
 @TableName("role_menu_relation")
 @EqualsAndHashCode(callSuper = true)
 public class RoleMenuRelationVo extends BaseEntity {
+    // 角色id
     private String roleId;
+    // 菜单id
     private String menuId;
+    // 角色id集合
     private List<String> roleIds;
+    // 菜单id集合
     private List<String> menuIds;
 }
