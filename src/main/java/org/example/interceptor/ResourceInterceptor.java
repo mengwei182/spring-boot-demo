@@ -54,7 +54,7 @@ public class ResourceInterceptor implements HandlerInterceptor {
         String servletPath = request.getServletPath();
         if (StringUtils.hasLength(servletPath)) {
             // 校验是否是不需要验证token的url
-            String[] noAuthUrls = commonProperties.getNoAuthUrls().split(",");
+            String[] noAuthUrls = commonProperties.getUrlWhiteList().split(",");
             for (String noAuthUrl : noAuthUrls) {
                 if (antPathMatcher.match(noAuthUrl, servletPath)) {
                     return true;
