@@ -2,7 +2,7 @@ package org.example.entity.vo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.example.common.entity.BaseEntity;
+import org.example.entity.BaseEntity;
 
 /**
  * @author lihui

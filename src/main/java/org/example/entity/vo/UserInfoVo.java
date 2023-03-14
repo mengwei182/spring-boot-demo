@@ -3,9 +3,12 @@ package org.example.entity.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.BaseEntity;
+import org.example.entity.Menu;
+import org.example.entity.Role;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author lihui
@@ -34,4 +37,8 @@ public class UserInfoVo extends BaseEntity {
     private Date loginTime;
     // 0禁用，1正常，2需要手机验证码，3需要图形验证码，4需要手机验证码和图像验证码
     private Integer status;
+    // 角色集合
+    private List<Role> roles;
+    // 菜单集合
+    private List<Menu> menus;
 }
