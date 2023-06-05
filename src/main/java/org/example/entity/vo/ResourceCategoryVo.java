@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.BaseEntity;
 
+import java.util.List;
+
 /**
  * @author lihui
  * @since 2022/10/29
@@ -11,10 +13,20 @@ import org.example.entity.BaseEntity;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class ResourceCategoryVo extends BaseEntity {
-    // 分类名称
+    /**
+     * 分类名称
+     */
     private String name;
-    // 排序
+    /**
+     * 排序
+     */
     private Integer sort;
-    // 描述
+    /**
+     * 描述
+     */
     private String description;
+    /**
+     * 资源列表
+     */
+    private List<ResourceVo> resources;
 }

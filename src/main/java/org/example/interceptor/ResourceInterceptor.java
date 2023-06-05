@@ -1,30 +1,26 @@
 package org.example.interceptor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.Role;
-import org.example.entity.RoleResourceRelation;
+import org.example.entity.vo.ResourceVo;
 import org.example.entity.vo.TokenVo;
+import org.example.entity.vo.UserInfoVo;
 import org.example.error.CommonErrorResult;
 import org.example.error.exception.CommonException;
 import org.example.properties.CommonProperties;
-import org.example.service.cache.ResourceCacheService;
-import org.example.service.cache.RoleCacheService;
-import org.example.service.cache.RoleResourceRelationCacheService;
 import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 /**
  * @author lihui
@@ -36,12 +32,6 @@ import java.util.stream.Collectors;
 public class ResourceInterceptor implements HandlerInterceptor {
     @Resource
     private CommonProperties commonProperties;
-    @Resource
-    private RoleCacheService roleCacheService;
-    @Resource
-    private ResourceCacheService resourceCacheService;
-    @Resource
-    private RoleResourceRelationCacheService roleResourceRelationCacheService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -52,33 +42,19 @@ public class ResourceInterceptor implements HandlerInterceptor {
         }
         AntPathMatcher antPathMatcher = new AntPathMatcher();
         String servletPath = request.getServletPath();
-        if (StringUtils.hasLength(servletPath)) {
-            // 校验是否是不需要验证token的url
-            String[] noAuthUrls = commonProperties.getUrlWhiteList().split(",");
-            for (String noAuthUrl : noAuthUrls) {
-                if (antPathMatcher.match(noAuthUrl, servletPath)) {
-                    return true;
-                }
-            }
-        } else {
-            throw new CommonException(CommonErrorResult.UNAUTHORIZED);
+        // 校验是否是不需要验证token的url
+        Optional<String> first = Arrays.stream(commonProperties.getUrlWhiteList().split(",")).filter(noAuthUrl -> antPathMatcher.match(noAuthUrl, servletPath)).findFirst();
+        if (first.isPresent()) {
+            return true;
         }
         String cookie = request.getHeader("Cookie");
-        TokenVo<?> tokenVo = TokenUtils.unsigned(cookie);
-        String userId = (String) tokenVo.getId();
-        List<Role> roles = roleCacheService.getRoleByUserId(userId);
-        Map<String, Role> roleMap = roles.stream().collect(Collectors.toMap(Role::getId, o -> o));
-        List<org.example.entity.Resource> resources = resourceCacheService.getResources();
-        Map<String, org.example.entity.Resource> resourceMap = resources.stream().collect(Collectors.toMap(org.example.entity.Resource::getId, o -> o));
-        List<RoleResourceRelation> roleResourceRelations = roleResourceRelationCacheService.getRoleResourceRelations();
-        for (RoleResourceRelation roleResourceRelation : roleResourceRelations) {
-            Role role = roleMap.get(roleResourceRelation.getRoleId());
-            if (role != null) {
-                org.example.entity.Resource resource = resourceMap.get(roleResourceRelation.getResourceId());
-                if (antPathMatcher.match(resource.getUrl(), servletPath)) {
-                    return true;
-                }
-            }
+        TokenVo<UserInfoVo> tokenVo = TokenUtils.unsigned(cookie, UserInfoVo.class);
+        // 经过AuthorizationInterceptor拦截器处理后，token不会为null
+        UserInfoVo userInfoVo = tokenVo.getData();
+        List<ResourceVo> resourceVos = userInfoVo.getResources();
+        Optional<ResourceVo> findAny = resourceVos.stream().filter(o -> antPathMatcher.match(o.getUrl(), servletPath)).findAny();
+        if (findAny.isPresent()) {
+            return true;
         }
         throw new CommonException(CommonErrorResult.UNAUTHORIZED);
     }

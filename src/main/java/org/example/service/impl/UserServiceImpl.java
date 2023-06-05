@@ -1,26 +1,23 @@
 package org.example.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.example.api.UserQueryPage;
-import org.example.entity.Menu;
-import org.example.entity.Role;
-import org.example.entity.User;
-import org.example.entity.UserRoleRelation;
-import org.example.entity.vo.TokenVo;
-import org.example.entity.vo.UserInfoVo;
-import org.example.entity.vo.UserRoleRelationVo;
-import org.example.entity.vo.UsernamePasswordVo;
-import org.example.error.UserServerErrorResult;
+import org.example.entity.*;
+import org.example.entity.vo.*;
+import org.example.error.SystemServerErrorResult;
 import org.example.error.exception.CommonException;
 import org.example.mapper.*;
 import org.example.service.UserService;
 import org.example.service.cache.UserCacheService;
 import org.example.usercontext.UserContext;
-import org.example.util.*;
+import org.example.util.CommonUtils;
+import org.example.util.PageUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,136 +25,122 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+/**
+ * @author lihui
+ * @since 2023/4/3
+ */
 @Slf4j
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserCacheService {
+    private static final String PHONE_VERIFY_PREFIX = "PHONE_VERIFY_PREFIX_";
+    private static final String IMAGE_VERIFY_PREFIX = "IMAGE_VERIFY_PREFIX_";
     @Resource
     private UserMapper userMapper;
     @Resource
+    private MenuMapper menuMapper;
+    @Resource
     private RoleMapper roleMapper;
     @Resource
-    private MenuMapper menuMapper;
+    private ResourceMapper resourceMapper;
+    @Resource
+    private PasswordEncoder passwordEncoder;
+    @Resource
+    private DepartmentMapper departmentMapper;
+    @Resource
+    private RedisTemplate<Object, Object> redisTemplate;
+    @Resource
+    private RoleMenuRelationMapper roleMenuRelationMapper;
     @Resource
     private UserRoleRelationMapper userRoleRelationMapper;
     @Resource
     private RoleResourceRelationMapper roleResourceRelationMapper;
-    @Resource
-    private PasswordEncoder passwordEncoder;
-    @Resource
-    private UserCacheService userCacheService;
 
+    /**
+     * 新增用户
+     *
+     * @param userInfoVo
+     * @return
+     */
     @Override
-    public String login(UsernamePasswordVo usernamePasswordVo) {
-        String username = usernamePasswordVo.getUsername();
-        String password = usernamePasswordVo.getPassword();
-        if (!StringUtils.hasLength(username)) {
-            throw new CommonException(UserServerErrorResult.USERNAME_NULL);
-        }
-        if (!StringUtils.hasLength(password)) {
-            throw new CommonException(UserServerErrorResult.PASSWORD_NULL);
-        }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(User::getUsername, username);
-        User user = userMapper.selectOne(queryWrapper);
-        if (user == null) {
-            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
-        }
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new CommonException(UserServerErrorResult.PASSWORD_ERROR);
-        }
-        Date loginTime = new Date();
-        UserInfoVo userInfoVo = buildUserVo(user);
-        TokenVo<?> tokenVo = new TokenVo<>(user.getId(), loginTime, 60 * 60L, userInfoVo);
-        String token = TokenUtils.sign(tokenVo);
-        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.lambda().set(User::getLoginTime, new Date()).eq(User::getId, user.getId());
-        userMapper.update(null, updateWrapper);
-        return token;
-    }
-
-    @Override
-    public Boolean logout() {
-        UserContext.remove();
-        return true;
-    }
-
-    @Override
-    public Boolean register(UserInfoVo userInfoVo) {
+    @Transactional
+    public Boolean addUser(UserInfoVo userInfoVo) {
         String username = userInfoVo.getUsername();
         String password = userInfoVo.getPassword();
         if (!StringUtils.hasLength(username)) {
-            throw new CommonException(UserServerErrorResult.USERNAME_NULL);
+            throw new CommonException(SystemServerErrorResult.USERNAME_NULL);
         }
         if (!StringUtils.hasLength(password)) {
-            throw new CommonException(UserServerErrorResult.PASSWORD_NULL);
+            throw new CommonException(SystemServerErrorResult.PASSWORD_NULL);
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getUsername, username);
         User user = userMapper.selectOne(queryWrapper);
         if (user != null) {
-            throw new CommonException(UserServerErrorResult.USER_EXIST);
+            throw new CommonException(SystemServerErrorResult.USER_EXIST);
         }
         user = new User();
         BeanUtils.copyProperties(userInfoVo, user);
         user.setId(CommonUtils.uuid());
         user.setPassword(passwordEncoder.encode(password));
-        user.setCreateId("");
-        user.setUpdateId("");
+        user.setCreateId(UserContext.get().getUserId());
+        user.setUpdateId(UserContext.get().getUserId());
         userMapper.insert(user);
+        // 添加角色信息
+        List<String> roleIds = userInfoVo.getRoleIds();
+        if (!CollectionUtils.isEmpty(roleIds)) {
+            for (String roleId : roleIds) {
+                UserRoleRelation userRoleRelation = new UserRoleRelation();
+                userRoleRelation.setUserId(user.getId());
+                userRoleRelation.setRoleId(roleId);
+                userRoleRelation.setCreateId(UserContext.get().getUserId());
+                userRoleRelation.setUpdateId(UserContext.get().getUserId());
+                userRoleRelationMapper.insert(userRoleRelation);
+            }
+        }
         return true;
     }
 
-    @Override
-    public Boolean generatePhoneVerifyCode(String phone) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            sb.append((int) (Math.random() * 10));
-        }
-        String verifyCode = sb.toString();
-        if (MessageUtils.sendMessage(phone, verifyCode)) {
-            userCacheService.setPhoneVerifyCode(phone, verifyCode, 5L);
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void generateImageVerifyCode(HttpServletResponse response) throws IOException {
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Cache-Control", "no-cache");
-        response.setDateHeader("Expires", 0);
-        response.setContentType("image/jpeg");
-        ServletOutputStream servletOutputStream = response.getOutputStream();
-        String verifyCode = ImageVerifyCodeUtils.outputVerifyImage(130, 30, servletOutputStream, 6);
-        userCacheService.setImageVerifyCode(UserContext.get().getUserId(), verifyCode, 5L);
-        servletOutputStream.close();
-    }
-
+    /**
+     * 查看用户详情
+     *
+     * @return
+     */
     @Override
     public UserInfoVo getUserInfo(String id) {
         if (!StringUtils.hasLength(id)) {
-            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
+            throw new CommonException(SystemServerErrorResult.USER_NOT_EXIST);
         }
         User user = userMapper.selectById(id);
-        return buildUserVo(user);
-    }
-
-    private UserInfoVo buildUserVo(User user) {
-        UserInfoVo userInfoVo = new UserInfoVo();
-        BeanUtils.copyProperties(user, userInfoVo);
-        List<Role> roles = roleMapper.getRolesByUserId(user.getId());
-        userInfoVo.setRoles(roles);
-        List<Menu> menus = menuMapper.getMenusByUserId(user.getId());
-        userInfoVo.setMenus(menus);
+        UserInfoVo userInfoVo = CommonUtils.transformObject(user, UserInfoVo.class);
+        userInfoVo.setPassword(null);
+        // 查询并填充用户角色信息
+        List<String> roleIds = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, user.getId())).stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList());
+        List<Role> roles = roleMapper.selectBatchIds(roleIds);
+        userInfoVo.setRoles(CommonUtils.transformList(roles, RoleVo.class));
+        // 查询并填充用户菜单信息
+        List<String> menuIds = roleMenuRelationMapper.selectList(new LambdaQueryWrapper<RoleMenuRelation>().in(RoleMenuRelation::getRoleId, roleIds)).stream().map(RoleMenuRelation::getMenuId).collect(Collectors.toList());
+        List<Menu> menus = menuMapper.selectBatchIds(menuIds);
+        userInfoVo.setMenus(CommonUtils.transformList(menus, MenuVo.class));
+        // 查询并填充用户资源信息
+        List<String> resourceIds = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, roleIds)).stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList());
+        List<org.example.entity.Resource> resources = resourceMapper.selectBatchIds(resourceIds);
+        userInfoVo.setResources(CommonUtils.transformList(resources, ResourceVo.class));
+        // 查询并填充用户部门信息
+        Department department = departmentMapper.selectById(user.getDepartmentId());
+        userInfoVo.setDepartment(CommonUtils.transformObject(department, DepartmentVo.class));
         return userInfoVo;
     }
 
+    /**
+     * 分页查看用户列表
+     *
+     * @param queryPage
+     * @return
+     */
     @Override
     public Page<UserInfoVo> getUserList(UserQueryPage queryPage) {
         Page<User> page = new Page<>(queryPage.getPageNumber(), queryPage.getPageSize());
@@ -166,62 +149,57 @@ public class UserServiceImpl implements UserService {
         return PageUtils.wrap(page, UserInfoVo.class);
     }
 
+    /**
+     * 更新用户信息
+     *
+     * @param userInfoVo
+     * @return
+     */
     @Override
     public Boolean updateUser(UserInfoVo userInfoVo) {
         User user = userMapper.selectById(userInfoVo.getId());
         if (user == null) {
-            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
+            throw new CommonException(SystemServerErrorResult.USER_NOT_EXIST);
         }
         BeanUtils.copyProperties(userInfoVo, user);
         userMapper.updateById(user);
         return true;
     }
 
+    /**
+     * 更新密码
+     *
+     * @param usernamePasswordVo
+     * @return
+     */
     @Override
     public Boolean updateUserPassword(UsernamePasswordVo usernamePasswordVo) {
         User user = userMapper.selectById(usernamePasswordVo.getId());
         if (user == null) {
-            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
+            throw new CommonException(SystemServerErrorResult.USER_NOT_EXIST);
         }
         String phone = usernamePasswordVo.getPhone();
         String phoneVerifyCode = usernamePasswordVo.getPhoneVerifyCode();
         if (!StringUtils.hasLength(phoneVerifyCode)) {
-            throw new CommonException(UserServerErrorResult.VERIFY_CODE_ERROR);
+            throw new CommonException(SystemServerErrorResult.VERIFY_CODE_ERROR);
         }
-        String phoneVerifyCodeCache = userCacheService.getPhoneVerifyCode(phone);
+        String phoneVerifyCodeCache = getPhoneVerifyCode(phone);
         if (!StringUtils.hasLength(phoneVerifyCodeCache)) {
-            throw new CommonException(UserServerErrorResult.VERIFY_CODE_OVERDUE);
+            throw new CommonException(SystemServerErrorResult.VERIFY_CODE_OVERDUE);
         }
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().set(User::getPassword, passwordEncoder.encode(usernamePasswordVo.getPassword())).eq(User::getId, user.getId());
         userMapper.update(null, updateWrapper);
-        userCacheService.deletePhoneVerifyCode(phone);
+        deletePhoneVerifyCode(phone);
         return true;
     }
 
-    @Override
-    @Transactional
-    public Boolean updateUserRole(UserRoleRelationVo userRoleRelationVo) {
-        User user = userMapper.selectById(userRoleRelationVo.getUserId());
-        if (user == null) {
-            throw new CommonException(UserServerErrorResult.USER_NOT_EXIST);
-        }
-        QueryWrapper<UserRoleRelation> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(UserRoleRelation::getUserId, userRoleRelationVo.getUserId());
-        userRoleRelationMapper.delete(queryWrapper);
-        List<String> roleIds = userRoleRelationVo.getRoleIds();
-        if (!CollectionUtils.isEmpty(roleIds)) {
-            for (String roleId : roleIds) {
-                UserRoleRelation userRoleRelation = new UserRoleRelation();
-                userRoleRelation.setId(CommonUtils.uuid());
-                userRoleRelation.setUserId(userRoleRelationVo.getUserId());
-                userRoleRelation.setRoleId(roleId);
-                userRoleRelationMapper.insert(userRoleRelation);
-            }
-        }
-        return true;
-    }
-
+    /**
+     * 删除用户
+     *
+     * @param id
+     * @return
+     */
     @Override
     @Transactional
     public Boolean deleteUser(String id) {
@@ -230,5 +208,78 @@ public class UserServiceImpl implements UserService {
         queryWrapper.lambda().eq(UserRoleRelation::getUserId, id);
         userRoleRelationMapper.delete(queryWrapper);
         return true;
+    }
+
+    /**
+     * 设置手机验证码到redis
+     *
+     * @param phone
+     * @param verifyCode
+     * @param timeout
+     */
+    @Override
+    public void setPhoneVerifyCode(String phone, String verifyCode, Long timeout) {
+        if (timeout != null && timeout > 0) {
+            redisTemplate.opsForValue().set(PHONE_VERIFY_PREFIX.concat(phone), verifyCode, timeout, TimeUnit.MINUTES);
+        } else {
+            redisTemplate.opsForValue().set(PHONE_VERIFY_PREFIX.concat(phone), verifyCode);
+        }
+    }
+
+    /**
+     * 从redis获取手机验证码
+     *
+     * @param phone
+     * @return
+     */
+    @Override
+    public String getPhoneVerifyCode(String phone) {
+        return (String) redisTemplate.opsForValue().get(PHONE_VERIFY_PREFIX.concat(phone));
+    }
+
+    /**
+     * 从redis删除手机验证码
+     *
+     * @param phone
+     */
+    @Override
+    public void deletePhoneVerifyCode(String phone) {
+        redisTemplate.delete(PHONE_VERIFY_PREFIX.concat(phone));
+    }
+
+    /**
+     * 设置图片验证码到redis
+     *
+     * @param account
+     * @param verifyCode
+     * @param timeout
+     */
+    @Override
+    public void setImageVerifyCode(String account, String verifyCode, Long timeout) {
+        if (timeout != null && timeout > 0) {
+            redisTemplate.opsForValue().set(IMAGE_VERIFY_PREFIX.concat(account), verifyCode, timeout, TimeUnit.MINUTES);
+        } else {
+            redisTemplate.opsForValue().set(IMAGE_VERIFY_PREFIX.concat(account), verifyCode);
+        }
+    }
+
+    /**
+     * 从redis获取图片验证码
+     *
+     * @param account
+     */
+    @Override
+    public String getImageVerifyCode(String account) {
+        return (String) redisTemplate.opsForValue().get(IMAGE_VERIFY_PREFIX.concat(account));
+    }
+
+    /**
+     * 从redis删除图片验证码
+     *
+     * @param account
+     */
+    @Override
+    public void deleteImageVerifyCode(String account) {
+        redisTemplate.delete(IMAGE_VERIFY_PREFIX.concat(account));
     }
 }

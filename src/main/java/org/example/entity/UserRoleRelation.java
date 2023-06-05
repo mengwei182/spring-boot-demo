@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
+ * 用户角色关联表
+ *
  * @author lihui
  * @since 2022/10/29
  */
@@ -12,8 +14,12 @@ import lombok.EqualsAndHashCode;
 @TableName("user_role_relation")
 @EqualsAndHashCode(callSuper = true)
 public class UserRoleRelation extends BaseEntity {
-    // 用户id
+    /**
+     * 用户id
+     */
     private String userId;
-    // 角色id
+    /**
+     * 角色id
+     */
     private String roleId;
 }

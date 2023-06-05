@@ -3,9 +3,8 @@ package org.example.entity.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.BaseEntity;
-import org.example.entity.Menu;
-import org.example.entity.Role;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
@@ -17,28 +16,67 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class UserInfoVo extends BaseEntity {
-    // 用户名
+    /**
+     * 用户名
+     */
     @NotNull(message = "用户名不能为空")
     private String username;
-    // 密码
+    /**
+     * 密码
+     */
     @NotNull(message = "密码不能为空")
     private String password;
-    // 头像
+    /**
+     * 头像
+     */
     private String icon;
-    // 手机号
+    /**
+     * 手机号
+     */
     private String phone;
-    // 邮箱
+    /**
+     * 邮箱
+     */
+    @Email
     private String email;
-    // 姓名
+    /**
+     * 姓名
+     */
     private String name;
-    // 描述
+    /**
+     * 描述
+     */
     private String description;
-    // 登录时间
+    /**
+     * 登录时间
+     */
     private Date loginTime;
-    // 0禁用，1正常，2需要手机验证码，3需要图形验证码，4需要手机验证码和图像验证码
+    /**
+     * 0禁用，1正常
+     */
     private Integer status;
-    // 角色集合
-    private List<Role> roles;
-    // 菜单集合
-    private List<Menu> menus;
+    /**
+     * 部门ID
+     */
+    private String departmentId;
+    /**
+     * 角色ID集合
+     */
+    private List<String> roleIds;
+    /**
+     * 菜单信息
+     */
+    private List<MenuVo> menus;
+    /**
+     * 角色信息
+     */
+    private List<RoleVo> roles;
+    /**
+     * 资源信息
+     */
+    private List<ResourceVo> resources;
+    /**
+     * 部门信息
+     */
+    private DepartmentVo department;
 }

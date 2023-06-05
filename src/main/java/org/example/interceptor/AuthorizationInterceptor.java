@@ -18,7 +18,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * token拦截器
@@ -40,18 +42,12 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             response.setStatus(HttpServletResponse.SC_OK);
             return true;
         }
+        AntPathMatcher antPathMatcher = new AntPathMatcher();
         String servletPath = request.getServletPath();
-        if (StringUtils.hasLength(servletPath)) {
-            // 校验是否是不需要验证token的url
-            AntPathMatcher antPathMatcher = new AntPathMatcher();
-            String[] noAuthUrls = commonProperties.getUrlWhiteList().split(",");
-            for (String noAuthUrl : noAuthUrls) {
-                if (antPathMatcher.match(noAuthUrl, servletPath)) {
-                    return true;
-                }
-            }
-        } else {
-            throw new CommonException(CommonErrorResult.UNAUTHORIZED);
+        // 校验是否是不需要验证token的url
+        Optional<String> first = Arrays.stream(commonProperties.getUrlWhiteList().split(",")).filter(noAuthUrl -> antPathMatcher.match(noAuthUrl, servletPath)).findFirst();
+        if (first.isPresent()) {
+            return true;
         }
         String cookie = request.getHeader("Cookie");
         if (StringUtils.hasLength(cookie)) {
@@ -69,10 +65,10 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void postHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, ModelAndView modelAndView) throws Exception {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
     }
 
     @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
     }
 }
