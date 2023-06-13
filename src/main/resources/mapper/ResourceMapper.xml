@@ -5,8 +5,8 @@
         SELECT *
         FROM resource
         <where>
-            <if test="name != null and name != null">
-                name LIKE CONCAT('%', #{name}, '%')
+            <if test="queryPage.name != null and queryPage.name != ''">
+                name LIKE CONCAT('%', #{queryPage.name}, '%')
             </if>
         </where>
     </select>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.example.mapper.ResourceCategoryMapper">
-    <select id="getResourceCategoryList" parameterType="org.example.system.api.ResourceCategoryQueryPage" resultType="org.example.common.entity.system.ResourceCategory">
+    <select id="getResourceCategoryList" parameterType="org.example.api.ResourceCategoryQueryPage" resultType="org.example.entity.ResourceCategory">
         SELECT *
         FROM resource_category
         <where>
