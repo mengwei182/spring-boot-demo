@@ -7,7 +7,6 @@ import org.example.error.CommonErrorResult;
 import org.example.error.exception.CommonException;
 import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.*;
@@ -26,7 +25,6 @@ import java.util.Date;
 @Slf4j
 @Order(1)
 @WebFilter
-@Component
 public class TokenFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

@@ -9,7 +9,6 @@ import org.example.error.CommonErrorResult;
 import org.example.error.exception.CommonException;
 import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 
@@ -30,7 +29,6 @@ import java.util.Optional;
 @Slf4j
 @Order(2)
 @WebFilter
-@Component
 public class ResourceFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {

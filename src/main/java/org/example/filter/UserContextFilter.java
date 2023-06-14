@@ -6,7 +6,6 @@ import org.example.entity.vo.UserInfoVo;
 import org.example.usercontext.UserContext;
 import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.*;
@@ -24,7 +23,6 @@ import java.io.IOException;
 @Slf4j
 @Order
 @WebFilter
-@Component
 public class UserContextFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
