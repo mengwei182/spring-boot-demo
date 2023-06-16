@@ -128,4 +128,16 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
         }
         return resourceCategoryVos;
     }
+
+    /**
+     * 根据资源分类名称查询资源分类信息
+     *
+     * @param name
+     * @return
+     */
+    @Override
+    public ResourceCategoryVo getResourceCategoryByName(String name) {
+        ResourceCategory resourceCategory = resourceCategoryMapper.selectOne(new LambdaQueryWrapper<ResourceCategory>().eq(ResourceCategory::getName, name));
+        return CommonUtils.transformObject(resourceCategory, ResourceCategoryVo.class);
+    }
 }

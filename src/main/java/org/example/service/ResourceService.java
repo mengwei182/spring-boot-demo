@@ -3,6 +3,7 @@ package org.example.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.api.ResourceQueryPage;
 import org.example.entity.vo.ResourceVo;
+import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 
@@ -58,7 +59,17 @@ public interface ResourceService {
     ResourceVo getResourceById(String id);
 
     /**
+     * 根据url和分类id查询资源信息
+     *
+     * @param url
+     * @param categoryId
+     * @return
+     */
+    ResourceVo getResource(String url, String categoryId);
+
+    /**
      * 刷新所有系统中所有资源
      */
+    @Async
     void refreshResource();
 }

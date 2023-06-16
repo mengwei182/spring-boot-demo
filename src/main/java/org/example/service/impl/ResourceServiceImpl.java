@@ -2,41 +2,55 @@ package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.extern.slf4j.Slf4j;
 import org.example.api.ResourceQueryPage;
 import org.example.entity.Resource;
 import org.example.entity.ResourceCategory;
 import org.example.entity.RoleResourceRelation;
+import org.example.entity.vo.ResourceCategoryVo;
 import org.example.entity.vo.ResourceVo;
 import org.example.error.SystemServerErrorResult;
 import org.example.error.exception.CommonException;
 import org.example.mapper.ResourceCategoryMapper;
 import org.example.mapper.ResourceMapper;
 import org.example.mapper.RoleResourceRelationMapper;
-import org.example.model.CommonResult;
+import org.example.service.ResourceCategoryService;
 import org.example.service.ResourceService;
 import org.example.util.CommonUtils;
 import org.example.util.PageUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.mvc.condition.PathPatternsRequestCondition;
+import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+import org.springframework.web.util.pattern.PathPattern;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author lihui
  * @since 2023/4/3
  */
+@Slf4j
 @Service
 public class ResourceServiceImpl implements ResourceService {
+    @Value("${spring.application.name}")
+    private String applicationName;
     @javax.annotation.Resource
     private ResourceMapper resourceMapper;
     @javax.annotation.Resource
     private ResourceCategoryMapper resourceCategoryMapper;
     @javax.annotation.Resource
+    private ResourceCategoryService resourceCategoryService;
+    @javax.annotation.Resource
     private RoleResourceRelationMapper roleResourceRelationMapper;
     @javax.annotation.Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     /**
      * 新增资源
@@ -145,12 +159,61 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     /**
+     * 根据url和分类id查询资源信息
+     *
+     * @param url
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public ResourceVo getResource(String url, String categoryId) {
+        Resource resource = resourceMapper.selectOne(new LambdaQueryWrapper<Resource>().eq(Resource::getUrl, url).eq(Resource::getCategoryId, categoryId));
+        return CommonUtils.transformObject(resource, ResourceVo.class);
+    }
+
+    /**
      * 刷新所有系统中所有资源
      */
     @Override
     public void refreshResource() {
-        CommonResult commonResult = CommonResult.success();
-        commonResult.setData(Boolean.TRUE);
-        redisTemplate.convertAndSend("refresh_resource_topic", commonResult);
+        Map<RequestMappingInfo, HandlerMethod> map = requestMappingHandlerMapping.getHandlerMethods();
+        Set<RequestMappingInfo> requestMappingInfos = map.keySet();
+        for (RequestMappingInfo requestMappingInfo : requestMappingInfos) {
+            // controller类名称
+            HandlerMethod handlerMethod = map.get(requestMappingInfo);
+            // controller类全限定名
+            String name = handlerMethod.getBeanType().getName();
+            // 请求地址
+            PathPatternsRequestCondition pathPatternsCondition = requestMappingInfo.getPathPatternsCondition();
+            if (pathPatternsCondition == null) {
+                continue;
+            }
+            String categoryName = applicationName + "_" + name;
+            String categoryId = CommonUtils.uuid();
+            ResourceCategoryVo resourceCategoryVo = resourceCategoryService.getResourceCategoryByName(categoryName);
+            // 资源分类不存在
+            if (resourceCategoryVo == null) {
+                resourceCategoryVo = new ResourceCategoryVo();
+                resourceCategoryVo.setId(categoryId);
+                resourceCategoryVo.setName(categoryName);
+                resourceCategoryVo = resourceCategoryService.addResourceCategory(resourceCategoryVo);
+                log.info("add resource category:{}", resourceCategoryVo.getName());
+            }
+            categoryId = resourceCategoryVo.getId();
+            Set<PathPattern> patterns = pathPatternsCondition.getPatterns();
+            for (PathPattern pattern : patterns) {
+                ResourceVo resourceVo = getResource(pattern.getPatternString(), categoryId);
+                // 资源已存在，直接跳过
+                if (resourceVo != null) {
+                    continue;
+                }
+                resourceVo = new ResourceVo();
+                resourceVo.setName(handlerMethod.getMethod().getName());
+                resourceVo.setCategoryId(categoryId);
+                resourceVo.setUrl(pattern.getPatternString());
+                addResource(resourceVo);
+                log.info("add resource:{}", resourceVo.getName());
+            }
+        }
     }
 }
