@@ -83,7 +83,7 @@ public class ResourceController {
     }
 
     /**
-     * 刷新所有系统中所有资源
+     * 刷新系统中所有资源
      *
      * @return
      */
