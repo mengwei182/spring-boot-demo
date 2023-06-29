@@ -28,7 +28,6 @@ import java.util.Optional;
  * @author lihui
  * @since 2022/10/26
  */
-@Slf4j
 @Order(2)
 @WebFilter
 @Component

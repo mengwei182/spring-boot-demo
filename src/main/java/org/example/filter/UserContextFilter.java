@@ -24,7 +24,6 @@ import java.io.IOException;
  * @author lihui
  * @since 2022/10/26
  */
-@Slf4j
 @WebFilter
 @Component
 @Order(Integer.MIN_VALUE)

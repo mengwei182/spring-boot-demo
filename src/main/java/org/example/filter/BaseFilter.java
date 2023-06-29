@@ -22,7 +22,6 @@ import java.util.Optional;
  * @author lihui
  * @since 2022/10/26
  */
-@Slf4j
 @WebFilter
 @Component
 @Order(Integer.MIN_VALUE)
