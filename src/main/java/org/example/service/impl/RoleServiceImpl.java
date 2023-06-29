@@ -7,8 +7,8 @@ import org.example.entity.RoleMenuRelation;
 import org.example.entity.UserRoleRelation;
 import org.example.entity.vo.RoleMenuRelationVo;
 import org.example.entity.vo.RoleVo;
-import org.example.error.CommonErrorResult;
-import org.example.error.SystemServerErrorResult;
+import org.example.error.CommonServerResult;
+import org.example.error.SystemServerResult;
 import org.example.error.exception.CommonException;
 import org.example.mapper.RoleMapper;
 import org.example.mapper.RoleMenuRelationMapper;
@@ -50,7 +50,7 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryWrapper<Role> queryWrapper = new LambdaQueryWrapper<>();
         Role resultRole = roleMapper.selectOne(queryWrapper.eq(Role::getName, roleVo.getName()));
         if (resultRole != null) {
-            throw new CommonException(SystemServerErrorResult.ROLE_NAME_EXIST);
+            throw new CommonException(SystemServerResult.ROLE_NAME_EXIST);
         }
         roleMapper.insert(role);
         return true;
@@ -67,7 +67,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean deleteRole(String id) {
         Role role = roleMapper.selectById(id);
         if (role == null) {
-            throw new CommonException(CommonErrorResult.OBJECT_NOT_EXIST);
+            throw new CommonException(CommonServerResult.OBJECT_NOT_EXIST);
         }
         roleMapper.deleteById(id);
         QueryWrapper<UserRoleRelation> userRoleRelationQueryWrapper = new QueryWrapper<>();
@@ -89,7 +89,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean updateRole(RoleVo roleVo) {
         Role role = roleMapper.selectById(roleVo.getId());
         if (role == null) {
-            throw new CommonException(CommonErrorResult.OBJECT_NOT_EXIST);
+            throw new CommonException(CommonServerResult.OBJECT_NOT_EXIST);
         }
         role = new Role();
         BeanUtils.copyProperties(roleVo, role);
@@ -108,7 +108,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean addRoleMenu(RoleMenuRelationVo roleMenuRelationVo) {
         Role role = roleMapper.selectById(roleMenuRelationVo.getRoleId());
         if (role == null) {
-            throw new CommonException(CommonErrorResult.OBJECT_NOT_EXIST);
+            throw new CommonException(CommonServerResult.OBJECT_NOT_EXIST);
         }
         QueryWrapper<RoleMenuRelation> roleMenuRelationQueryWrapper = new QueryWrapper<>();
         roleMenuRelationQueryWrapper.lambda().eq(RoleMenuRelation::getRoleId, roleMenuRelationVo.getRoleId());

@@ -1,8 +1,13 @@
 package org.example.model;
 
 import lombok.Data;
+import org.example.error.CommonServerResult;
 import org.example.global.ResultCode;
 
+/**
+ * @author lihui
+ * @since 2022/10/26
+ */
 @Data
 public class CommonResult {
     private Integer code;
@@ -19,11 +24,11 @@ public class CommonResult {
     }
 
     public static CommonResult success() {
-        return new CommonResult(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getName(), null);
+        return new CommonResult(ResultCode.SUCCESS.getCode(), CommonServerResult.SUCCESS, null);
     }
 
     public static CommonResult success(Object data) {
-        return new CommonResult(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getName(), data);
+        return new CommonResult(ResultCode.SUCCESS.getCode(), CommonServerResult.SUCCESS, data);
     }
 
     public static CommonResult success(String message) {
@@ -35,11 +40,11 @@ public class CommonResult {
     }
 
     public static CommonResult error() {
-        return new CommonResult(ResultCode.ERROR.getCode(), ResultCode.ERROR.getName(), null);
+        return new CommonResult(ResultCode.ERROR.getCode(), CommonServerResult.ERROR, null);
     }
 
     public static CommonResult error(Object data) {
-        return new CommonResult(ResultCode.ERROR.getCode(), ResultCode.ERROR.getName(), data);
+        return new CommonResult(ResultCode.ERROR.getCode(), CommonServerResult.ERROR, data);
     }
 
     public static CommonResult error(String message) {
@@ -51,10 +56,10 @@ public class CommonResult {
     }
 
     public static CommonResult unauthorized() {
-        return new CommonResult(ResultCode.UNAUTHORIZED.getCode(), ResultCode.UNAUTHORIZED.getName(), null);
+        return new CommonResult(ResultCode.UNAUTHORIZED.getCode(), CommonServerResult.UNAUTHORIZED, null);
     }
 
     public static CommonResult forbidden() {
-        return new CommonResult(ResultCode.FORBIDDEN.getCode(), ResultCode.FORBIDDEN.getName(), null);
+        return new CommonResult(ResultCode.FORBIDDEN.getCode(), CommonServerResult.FORBIDDEN, null);
     }
 }

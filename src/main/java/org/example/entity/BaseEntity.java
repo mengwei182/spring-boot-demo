@@ -6,6 +6,7 @@ import lombok.Data;
 import org.example.util.tree.TreeModelField;
 import org.example.util.tree.TreeModelFieldEnum;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date;
  * @since 2022/10/25
  */
 @Data
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Serializable {
     /**
      * 顶级节点父级ID
      */

@@ -4,7 +4,7 @@ package org.example.error;
  * @author lihui
  * @since 2022/11/8
  */
-public interface SystemServerErrorResult {
+public interface SystemServerResult {
     String USERNAME_NULL = "用户名为空";
     String PASSWORD_NULL = "密码为空";
     String USER_EXIST = "用户已存在";
@@ -27,4 +27,6 @@ public interface SystemServerErrorResult {
     String DICTIONARY_NAME_EXIST = "存在同名字典";
     String DICTIONARY_CODE_EXIST = "存在相同编码字典";
     String DICTIONARY_CHILD_EXIST = "存在子字典";
+    String TOKEN_EXPIRATION_TIMEOUT_MIN = "Token过期时间小于最小值";
+    String TOKEN_EXPIRATION_TIMEOUT_MAX = "Token过期时间大于最大值";
 }

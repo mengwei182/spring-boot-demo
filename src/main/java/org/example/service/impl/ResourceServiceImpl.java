@@ -2,24 +2,30 @@ package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.example.api.ResourceQueryPage;
 import org.example.entity.Resource;
 import org.example.entity.ResourceCategory;
 import org.example.entity.RoleResourceRelation;
+import org.example.entity.UserRoleRelation;
 import org.example.entity.vo.ResourceCategoryVo;
 import org.example.entity.vo.ResourceVo;
-import org.example.error.SystemServerErrorResult;
+import org.example.error.SystemServerResult;
 import org.example.error.exception.CommonException;
 import org.example.mapper.ResourceCategoryMapper;
 import org.example.mapper.ResourceMapper;
 import org.example.mapper.RoleResourceRelationMapper;
+import org.example.mapper.UserRoleRelationMapper;
 import org.example.service.ResourceCategoryService;
 import org.example.service.ResourceService;
+import org.example.service.cache.ResourceCacheService;
 import org.example.util.CommonUtils;
 import org.example.util.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.method.HandlerMethod;
@@ -31,6 +37,7 @@ import org.springframework.web.util.pattern.PathPattern;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author lihui
@@ -38,7 +45,7 @@ import java.util.Set;
  */
 @Slf4j
 @Service
-public class ResourceServiceImpl implements ResourceService {
+public class ResourceServiceImpl implements ResourceService, ResourceCacheService {
     @Value("${spring.application.name}")
     private String applicationName;
     @javax.annotation.Resource
@@ -51,6 +58,11 @@ public class ResourceServiceImpl implements ResourceService {
     private RoleResourceRelationMapper roleResourceRelationMapper;
     @javax.annotation.Resource
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
+    @javax.annotation.Resource
+    private UserRoleRelationMapper userRoleRelationMapper;
+    @javax.annotation.Resource
+    private RedisTemplate<String, Object> redisTemplate;
+    private static final String USER_TOKEN_HASH_KEY = "USER_TOKEN_HASH_KEY";
 
     /**
      * 新增资源
@@ -62,11 +74,11 @@ public class ResourceServiceImpl implements ResourceService {
     public Boolean addResource(ResourceVo resourceVo) {
         ResourceCategory resourceCategory = resourceCategoryMapper.selectById(resourceVo.getCategoryId());
         if (resourceCategory == null) {
-            throw new CommonException(SystemServerErrorResult.CATEGORY_NOT_EXIST);
+            throw new CommonException(SystemServerResult.CATEGORY_NOT_EXIST);
         }
         Long count = resourceMapper.selectCount(new LambdaQueryWrapper<Resource>().eq(Resource::getCategoryId, resourceVo.getCategoryId()).eq(Resource::getName, resourceVo.getName()));
         if (count != null && count > 0) {
-            throw new CommonException(SystemServerErrorResult.RESOURCE_NAME_DUPLICATE);
+            throw new CommonException(SystemServerResult.RESOURCE_NAME_DUPLICATE);
         }
         Resource resource = new Resource();
         BeanUtils.copyProperties(resourceVo, resource);
@@ -86,7 +98,7 @@ public class ResourceServiceImpl implements ResourceService {
     public Boolean deleteResource(String id) {
         Resource resource = resourceMapper.selectById(id);
         if (resource == null) {
-            throw new CommonException(SystemServerErrorResult.RESOURCE_NOT_EXIST);
+            throw new CommonException(SystemServerResult.RESOURCE_NOT_EXIST);
         }
         // 删除角色资源表的关联信息
         roleResourceRelationMapper.delete(new LambdaQueryWrapper<RoleResourceRelation>().eq(RoleResourceRelation::getResourceId, id));
@@ -104,15 +116,15 @@ public class ResourceServiceImpl implements ResourceService {
     public Boolean updateResource(ResourceVo resourceVo) {
         Resource resource = resourceMapper.selectById(resourceVo.getId());
         if (resource == null) {
-            throw new CommonException(SystemServerErrorResult.RESOURCE_NOT_EXIST);
+            throw new CommonException(SystemServerResult.RESOURCE_NOT_EXIST);
         }
         ResourceCategory resourceCategory = resourceCategoryMapper.selectById(resourceVo.getCategoryId());
         if (resourceCategory == null) {
-            throw new CommonException(SystemServerErrorResult.CATEGORY_NOT_EXIST);
+            throw new CommonException(SystemServerResult.CATEGORY_NOT_EXIST);
         }
         Long count = resourceMapper.selectCount(new LambdaQueryWrapper<Resource>().eq(Resource::getCategoryId, resourceVo.getCategoryId()).eq(Resource::getName, resourceVo.getName()));
         if (count != null && count > 0) {
-            throw new CommonException(SystemServerErrorResult.RESOURCE_NAME_DUPLICATE);
+            throw new CommonException(SystemServerResult.RESOURCE_NAME_DUPLICATE);
         }
         Resource insterResource = new Resource();
         BeanUtils.copyProperties(resourceVo, insterResource);
@@ -215,5 +227,27 @@ public class ResourceServiceImpl implements ResourceService {
                 log.info("add resource:{}", resourceVo.getName());
             }
         }
+    }
+
+    /**
+     * 根据用户id获取资源列表
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<ResourceVo> getResourceByUserId(String userId) {
+        HashOperations<String, Object, Object> opsForHash = redisTemplate.opsForHash();
+        Object object = opsForHash.get(USER_TOKEN_HASH_KEY, userId);
+        if (object == null) {
+            List<UserRoleRelation> userRoleRelations = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, userId));
+            List<RoleResourceRelation> roleResourceRelations = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, userRoleRelations.stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList())));
+            List<org.example.entity.Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<org.example.entity.Resource>().in(org.example.entity.Resource::getId, roleResourceRelations.stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList())));
+            List<ResourceVo> resourceVos = CommonUtils.transformList(resources, ResourceVo.class);
+            opsForHash.put(USER_TOKEN_HASH_KEY, userId, resourceVos);
+            return resourceVos;
+        }
+        return CommonUtils.gson().fromJson(CommonUtils.gson().toJson(object), new TypeToken<>() {
+        });
     }
 }

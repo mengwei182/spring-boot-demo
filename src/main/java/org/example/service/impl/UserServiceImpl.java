@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.api.UserQueryPage;
 import org.example.entity.*;
 import org.example.entity.vo.*;
-import org.example.error.SystemServerErrorResult;
+import org.example.error.SystemServerResult;
 import org.example.error.exception.CommonException;
 import org.example.mapper.*;
 import org.example.service.UserService;
@@ -71,16 +71,16 @@ public class UserServiceImpl implements UserService, UserCacheService {
         String username = userInfoVo.getUsername();
         String password = userInfoVo.getPassword();
         if (!StringUtils.hasLength(username)) {
-            throw new CommonException(SystemServerErrorResult.USERNAME_NULL);
+            throw new CommonException(SystemServerResult.USERNAME_NULL);
         }
         if (!StringUtils.hasLength(password)) {
-            throw new CommonException(SystemServerErrorResult.PASSWORD_NULL);
+            throw new CommonException(SystemServerResult.PASSWORD_NULL);
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getUsername, username);
         User user = userMapper.selectOne(queryWrapper);
         if (user != null) {
-            throw new CommonException(SystemServerErrorResult.USER_EXIST);
+            throw new CommonException(SystemServerResult.USER_EXIST);
         }
         user = new User();
         BeanUtils.copyProperties(userInfoVo, user);
@@ -112,7 +112,7 @@ public class UserServiceImpl implements UserService, UserCacheService {
     @Override
     public UserInfoVo getUserInfo(String id) {
         if (!StringUtils.hasLength(id)) {
-            throw new CommonException(SystemServerErrorResult.USER_NOT_EXIST);
+            throw new CommonException(SystemServerResult.USER_NOT_EXIST);
         }
         User user = userMapper.selectById(id);
         UserInfoVo userInfoVo = CommonUtils.transformObject(user, UserInfoVo.class);
@@ -159,7 +159,7 @@ public class UserServiceImpl implements UserService, UserCacheService {
     public Boolean updateUser(UserInfoVo userInfoVo) {
         User user = userMapper.selectById(userInfoVo.getId());
         if (user == null) {
-            throw new CommonException(SystemServerErrorResult.USER_NOT_EXIST);
+            throw new CommonException(SystemServerResult.USER_NOT_EXIST);
         }
         BeanUtils.copyProperties(userInfoVo, user);
         userMapper.updateById(user);
@@ -176,16 +176,16 @@ public class UserServiceImpl implements UserService, UserCacheService {
     public Boolean updateUserPassword(UsernamePasswordVo usernamePasswordVo) {
         User user = userMapper.selectById(usernamePasswordVo.getId());
         if (user == null) {
-            throw new CommonException(SystemServerErrorResult.USER_NOT_EXIST);
+            throw new CommonException(SystemServerResult.USER_NOT_EXIST);
         }
         String phone = usernamePasswordVo.getPhone();
         String phoneVerifyCode = usernamePasswordVo.getPhoneVerifyCode();
         if (!StringUtils.hasLength(phoneVerifyCode)) {
-            throw new CommonException(SystemServerErrorResult.VERIFY_CODE_ERROR);
+            throw new CommonException(SystemServerResult.VERIFY_CODE_ERROR);
         }
         String phoneVerifyCodeCache = getPhoneVerifyCode(phone);
         if (!StringUtils.hasLength(phoneVerifyCodeCache)) {
-            throw new CommonException(SystemServerErrorResult.VERIFY_CODE_OVERDUE);
+            throw new CommonException(SystemServerResult.VERIFY_CODE_OVERDUE);
         }
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().set(User::getPassword, passwordEncoder.encode(usernamePasswordVo.getPassword())).eq(User::getId, user.getId());

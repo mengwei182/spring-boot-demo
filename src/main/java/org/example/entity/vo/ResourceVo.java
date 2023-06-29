@@ -3,8 +3,8 @@ package org.example.entity.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.BaseEntity;
-import org.example.error.CommonErrorResult;
-import org.example.error.SystemServerErrorResult;
+import org.example.error.CommonServerResult;
+import org.example.error.SystemServerResult;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -19,14 +19,14 @@ public class ResourceVo extends BaseEntity {
     /**
      * 资源名称
      */
-    @NotNull(message = CommonErrorResult.NAME_NOT_NULL)
-    @Size(min = 1, max = 255, message = CommonErrorResult.NAME_LENGTH_ERROR)
+    @NotNull(message = CommonServerResult.NAME_NOT_NULL)
+    @Size(min = 1, max = 255, message = CommonServerResult.NAME_LENGTH_ERROR)
     private String name;
     /**
      * 资源URL
      */
-    @NotNull(message = SystemServerErrorResult.RESOURCE_URL_NOT_NULL)
-    @Size(min = 1, max = 255, message = SystemServerErrorResult.RESOURCE_URL_LENGTH_ERROR)
+    @NotNull(message = SystemServerResult.RESOURCE_URL_NOT_NULL)
+    @Size(min = 1, max = 255, message = SystemServerResult.RESOURCE_URL_LENGTH_ERROR)
     private String url;
     /**
      * 描述
@@ -35,8 +35,8 @@ public class ResourceVo extends BaseEntity {
     /**
      * 资源分类id
      */
-    @NotNull(message = SystemServerErrorResult.RESOURCE_CATEGORY_ID_NOT_NULL)
-    @Size(message = SystemServerErrorResult.RESOURCE_CATEGORY_ID_LENGTH_ERROR)
+    @NotNull(message = SystemServerResult.RESOURCE_CATEGORY_ID_NOT_NULL)
+    @Size(message = SystemServerResult.RESOURCE_CATEGORY_ID_LENGTH_ERROR)
     private String categoryId;
     /**
      * 状态
