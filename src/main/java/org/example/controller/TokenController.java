@@ -25,7 +25,7 @@ public class TokenController {
      * @return
      */
     @RequestMapping("/refresh")
-    public CommonResult refresh(@RequestParam Long expiration) {
+    public CommonResult<String> refresh(@RequestParam Long expiration) {
         return CommonResult.success(tokenService.refresh(expiration));
     }
 }
