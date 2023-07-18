@@ -16,6 +16,7 @@ import org.example.service.cache.UserCacheService;
 import org.example.usercontext.UserContext;
 import org.example.util.CommonUtils;
 import org.example.util.PageUtils;
+import org.example.util.tree.TreeModelUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -124,7 +125,7 @@ public class UserServiceImpl implements UserService, UserCacheService {
         // 查询并填充用户菜单信息
         List<String> menuIds = roleMenuRelationMapper.selectList(new LambdaQueryWrapper<RoleMenuRelation>().in(RoleMenuRelation::getRoleId, roleIds)).stream().map(RoleMenuRelation::getMenuId).collect(Collectors.toList());
         List<Menu> menus = menuMapper.selectBatchIds(menuIds);
-        userInfoVo.setMenus(CommonUtils.transformList(menus, MenuVo.class));
+        userInfoVo.setMenus(TreeModelUtils.buildObjectTree(CommonUtils.transformList(menus, MenuVo.class)));
         // 查询并填充用户资源信息
         List<String> resourceIds = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, roleIds)).stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList());
         List<org.example.entity.Resource> resources = resourceMapper.selectBatchIds(resourceIds);

@@ -3,7 +3,6 @@ package org.example.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.api.MenuQueryPage;
 import org.example.entity.vo.MenuVo;
-import org.example.entity.vo.TreeModel;
 
 import java.util.List;
 
@@ -56,5 +55,5 @@ public interface MenuService {
      *
      * @return
      */
-    List<TreeModel> getMenuTreeList();
+    List<MenuVo> getMenuTreeList();
 }

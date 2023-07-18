@@ -8,7 +8,6 @@ import org.example.entity.BaseEntity;
 import org.example.entity.Menu;
 import org.example.entity.RoleMenuRelation;
 import org.example.entity.vo.MenuVo;
-import org.example.entity.vo.TreeModel;
 import org.example.error.CommonServerResult;
 import org.example.error.SystemServerResult;
 import org.example.error.exception.CommonException;
@@ -160,8 +159,8 @@ public class MenuServiceImpl implements MenuService {
      * @return
      */
     @Override
-    public List<TreeModel> getMenuTreeList() {
+    public List<MenuVo> getMenuTreeList() {
         List<Menu> menus = menuMapper.selectList(new LambdaQueryWrapper<>());
-        return TreeModelUtils.buildTreeModel(menus);
+        return TreeModelUtils.buildObjectTree(CommonUtils.transformList(menus, MenuVo.class));
     }
 }
