@@ -33,10 +33,6 @@ public class CommonResult<T> implements Serializable {
         return new CommonResult<>(ResultCode.SUCCESS.getCode(), CommonServerResult.SUCCESS, data);
     }
 
-    public static <T> CommonResult<T> success(String message) {
-        return new CommonResult<>(ResultCode.SUCCESS.getCode(), message, null);
-    }
-
     public static <T> CommonResult<T> success(String message, T data) {
         return new CommonResult<>(ResultCode.SUCCESS.getCode(), message, data);
     }

@@ -35,10 +35,6 @@ public class Department extends BaseEntity {
      */
     private Integer sort;
     /**
-     * 图标
-     */
-    private String icon;
-    /**
      * 状态
      */
     private Integer status;
