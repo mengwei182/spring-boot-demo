@@ -24,7 +24,11 @@ public class Menu extends BaseEntity {
     /**
      * 路由地址
      */
-    private String routeAddress;
+    private String path;
+    /**
+     * 组件
+     */
+    private String component;
     /**
      * 父级id
      */

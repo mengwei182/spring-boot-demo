@@ -51,14 +51,14 @@ public class TokenFilter implements Filter {
         UserInfoVo userInfoVo = tokenVo.getData();
         if (userInfoVo == null) {
             response.setStatus(ResultCode.UNAUTHORIZED.getCode());
-            servletResponse.getWriter().print(CommonUtils.gson().toJson(CommonResult.unauthorized()));
+            response.getWriter().print(CommonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
         }
         // token过期
         Object token = redisTemplate.opsForValue().get(userInfoVo.getId());
         if (token == null) {
             response.setStatus(ResultCode.UNAUTHORIZED.getCode());
-            servletResponse.getWriter().print(CommonUtils.gson().toJson(CommonResult.error(CommonServerResult.TOKEN_TIME_OUT)));
+            response.getWriter().print(CommonUtils.gson().toJson(CommonResult.error(CommonServerResult.TOKEN_TIME_OUT)));
             return;
         }
         filterChain.doFilter(request, response);

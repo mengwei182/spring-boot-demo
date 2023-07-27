@@ -1,6 +1,5 @@
 package org.example.filter;
 
-import lombok.extern.slf4j.Slf4j;
 import org.example.entity.vo.TokenVo;
 import org.example.entity.vo.UserInfoVo;
 import org.example.global.ResultCode;
@@ -24,28 +23,29 @@ import java.io.IOException;
  * @author lihui
  * @since 2022/10/26
  */
+@Order
 @WebFilter
 @Component
-@Order(Integer.MIN_VALUE)
 public class UserContextFilter implements Filter {
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");  String authorizationHeader = request.getHeader(BaseFilter.AUTHORIZATION);
+        response.setCharacterEncoding("UTF-8");
+        String authorizationHeader = request.getHeader(BaseFilter.AUTHORIZATION);
         String authorizationParameter = request.getParameter(BaseFilter.AUTHORIZATION);
         String authorization = StringUtils.hasLength(authorizationHeader) ? authorizationHeader : authorizationParameter;
         if (!StringUtils.hasLength(authorization)) {
             response.setStatus(ResultCode.UNAUTHORIZED.getCode());
-            servletResponse.getWriter().print(CommonUtils.gson().toJson(CommonResult.unauthorized()));
+            response.getWriter().print(CommonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
         }
         TokenVo<UserInfoVo> tokenVo = TokenUtils.unsigned(authorization, UserInfoVo.class);
         UserInfoVo userInfoVo = tokenVo.getData();
         if (userInfoVo == null) {
             response.setStatus(ResultCode.UNAUTHORIZED.getCode());
-            servletResponse.getWriter().print(CommonUtils.gson().toJson(CommonResult.unauthorized()));
+            response.getWriter().print(CommonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
         }
         UserContext.set(userInfoVo.getId(), userInfoVo.getUsername(), userInfoVo);
