@@ -2,7 +2,6 @@ package org.example.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.example.api.ResourceQueryPage;
 import org.example.entity.Resource;
@@ -238,16 +237,15 @@ public class ResourceServiceImpl implements ResourceService, ResourceCacheServic
     @Override
     public List<ResourceVo> getResourceByUserId(String userId) {
         HashOperations<String, Object, Object> opsForHash = redisTemplate.opsForHash();
-        Object object = opsForHash.get(USER_TOKEN_HASH_KEY, userId);
-        if (object == null) {
+        List<ResourceVo> resourceVos = (List<ResourceVo>) opsForHash.get(USER_TOKEN_HASH_KEY, userId);
+        if (resourceVos == null) {
             List<UserRoleRelation> userRoleRelations = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, userId));
             List<RoleResourceRelation> roleResourceRelations = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, userRoleRelations.stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList())));
-            List<org.example.entity.Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<org.example.entity.Resource>().in(org.example.entity.Resource::getId, roleResourceRelations.stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList())));
-            List<ResourceVo> resourceVos = CommonUtils.transformList(resources, ResourceVo.class);
+            List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>().in(Resource::getId, roleResourceRelations.stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList())));
+            resourceVos = CommonUtils.transformList(resources, ResourceVo.class);
             opsForHash.put(USER_TOKEN_HASH_KEY, userId, resourceVos);
             return resourceVos;
         }
-        return CommonUtils.gson().fromJson(CommonUtils.gson().toJson(object), new TypeToken<>() {
-        });
+        return resourceVos;
     }
 }

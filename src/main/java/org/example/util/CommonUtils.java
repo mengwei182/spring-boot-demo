@@ -14,8 +14,6 @@ import java.util.UUID;
  * @since 2023/4/3
  */
 public class CommonUtils {
-    private static final Gson GSON = new Gson();
-
     private CommonUtils() {
     }
 
@@ -26,15 +24,6 @@ public class CommonUtils {
      */
     public static String uuid() {
         return UUID.randomUUID().toString().replaceAll("-", "");
-    }
-
-    /**
-     * 返回全局GSON对象
-     *
-     * @return
-     */
-    public static Gson gson() {
-        return GSON;
     }
 
     /**
@@ -84,6 +73,6 @@ public class CommonUtils {
     }
 
     public static <T> T fromJson(String json, Class<T> clazz) {
-        return GSON.fromJson(json, TypeToken.get(clazz));
+        return GsonUtils.gson().fromJson(json, TypeToken.get(clazz));
     }
 }
