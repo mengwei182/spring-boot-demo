@@ -53,7 +53,7 @@ public class User extends BaseEntity {
      */
     private Date loginTime;
     /**
-     * 状态：0禁用，1正常，2需要手机验证码，3需要图形验证码，4需要手机验证码和图像验证码
+     * 状态：0禁用，1正常
      */
     private Integer status;
 }

@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 public class CommonControllerAdvice {
     @ResponseBody
     @ExceptionHandler(RuntimeException.class)
-    public CommonResult commonException(RuntimeException exception, HttpServletResponse response) {
-        return CommonResult.error(CommonServerResult.ERROR);
+    public CommonResult<?> commonException(RuntimeException exception, HttpServletResponse response) {
+        return CommonResult.error(CommonServerResult.ERROR, exception.getMessage());
     }
 }

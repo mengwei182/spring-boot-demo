@@ -14,7 +14,7 @@ import org.example.service.cache.ResourceCacheService;
 import org.example.service.cache.UserCacheService;
 import org.example.usercontext.UserContext;
 import org.example.util.CommonUtils;
-import org.example.util.ImageVerifyCodeUtils;
+import org.example.util.ImageCaptchaUtils;
 import org.example.util.TokenUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -99,20 +99,25 @@ public class BaseServiceImpl implements BaseService {
     }
 
     /**
-     * 获取图片验证码
+     * 生成图片验证码
      *
      * @param response
+     * @param width 图片宽度
+     * @param height 图片高度
+     * @param captchaSize 验证码位数
      * @throws IOException
      */
     @Override
-    public void generateImageVerifyCode(HttpServletResponse response) throws IOException {
+    public void generateImageCaptcha(HttpServletResponse response, Integer width, Integer height, Integer captchaSize) throws IOException {
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);
         response.setContentType("image/jpeg");
         ServletOutputStream os = response.getOutputStream();
-        String verifyCode = ImageVerifyCodeUtils.outputVerifyImage(130, 30, os, 6);
-        userCacheService.setImageVerifyCode(UserContext.get().getUserId(), verifyCode, 5L);
+        String captchaCode = CommonUtils.uuid();
+        response.setHeader("captchaCode", captchaCode);
+        String captcha = ImageCaptchaUtils.outputCaptchaImage(width, height, os, captchaSize);
+        redisTemplate.opsForValue().set(captchaCode, captcha, 10L, TimeUnit.MINUTES);
         os.close();
     }
 }
