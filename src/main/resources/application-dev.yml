@@ -23,6 +23,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
     consumer:
-      group-id: spring_cloud_demo_group
+      group-id: spring_boot_demo_group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+common:
+  skipUrl: /base/login,/base/register,/base/logout

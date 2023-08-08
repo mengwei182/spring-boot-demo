@@ -1,14 +1,14 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/spring_boot_demo?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://test:3306/spring_boot_demo?serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&allowPublicKeyRetrieval=true
     username: root
-    password: mengwei131575585
+    password: test
   redis:
-    host: localhost
+    host: test
     database: 1
     port: 6379
-    password: mengwei131575585
+    password: test
     timeout: 3000ms
     lettuce:
       pool:
@@ -18,7 +18,7 @@ spring:
         max-active: 8
         max-wait: 180000
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: test:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
