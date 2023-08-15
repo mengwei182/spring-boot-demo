@@ -54,7 +54,7 @@ public class BaseController {
      * @throws IOException
      */
     @RequestMapping("/image/captcha")
-    public void getImageCaptcha(HttpServletResponse response, @RequestParam(defaultValue = "130") Integer width, @RequestParam(defaultValue = "30") Integer height, @RequestParam(defaultValue = "6") Integer captchaSize) throws IOException {
+    public void getImageCaptcha(HttpServletResponse response, @RequestParam(defaultValue = "130") Integer width, @RequestParam(defaultValue = "30") Integer height, @RequestParam(defaultValue = "4") Integer captchaSize) throws IOException {
         baseService.generateImageCaptcha(response, width, height, captchaSize);
     }
 }
