@@ -24,4 +24,8 @@
         </dependency>
         <!--spring boot end-->
     </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+    </build>
 </project>
