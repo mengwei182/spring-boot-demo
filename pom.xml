@@ -153,13 +153,6 @@
             <version>2.0.1.Final</version>
         </dependency>
         <!--utils end-->
-
-        <dependency>
-            <groupId>org.pac4j</groupId>
-            <artifactId>pac4j-cas</artifactId>
-            <version>5.7.1</version>
-            <scope>runtime</scope>
-        </dependency>
     </dependencies>
 
     <build>
