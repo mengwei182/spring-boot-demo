@@ -26,9 +26,9 @@
 
     <modules>
         <module>boot-launch</module>
-        <module>boot-common</module>
-        <module>boot-system</module>
-        <module>boot-framework</module>
+        <module>common-model</module>
+        <module>common-configuration</module>
+        <module>api-server</module>
     </modules>
 
     <dependencyManagement>
@@ -153,6 +153,13 @@
             <version>2.0.1.Final</version>
         </dependency>
         <!--utils end-->
+
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-cas</artifactId>
+            <version>5.7.1</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
