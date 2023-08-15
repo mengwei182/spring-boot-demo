@@ -63,9 +63,11 @@
         </dependency>
         <!--mybatis end-->
 
+        <!--utils start-->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
+        <!--utils end-->
     </dependencies>
 </project>
