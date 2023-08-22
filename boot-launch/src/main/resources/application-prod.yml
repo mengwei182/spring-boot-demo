@@ -26,5 +26,3 @@ spring:
       group-id: spring_boot_demo_group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-common:
-  skipUrl: /base/login,/base/register,/base/logout
