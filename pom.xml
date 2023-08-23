@@ -16,6 +16,7 @@
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <jedis.version>4.4.3</jedis.version>
         <mysql.version>8.0.33</mysql.version>
+        <pac4j.version>4.5.7</pac4j.version>
         <spring.kafka.version>2.9.10</spring.kafka.version>
         <spring.boot.starter.version>2.7.14</spring.boot.starter.version>
         <spring.boot.maven.plugin.version>3.1.2</spring.boot.maven.plugin.version>
@@ -153,6 +154,12 @@
             <version>2.0.1.Final</version>
         </dependency>
         <!--utils end-->
+
+        <dependency>
+            <groupId>org.pac4j</groupId>
+            <artifactId>pac4j-cas</artifactId>
+            <version>${pac4j.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

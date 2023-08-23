@@ -20,4 +20,8 @@ mybatis:
     map-underscore-to-camel-case: true
 
 common:
-  skipUrl: /base/login,/base/register,/base/logout,/*/**
+  skipUrl: /base/login,/base/register,/base/logout
+
+key:
+  encrypt:
+    enable: true
