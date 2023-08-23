@@ -23,8 +23,6 @@ import org.example.util.CommonUtils;
 import org.example.util.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.method.HandlerMethod;
@@ -59,9 +57,6 @@ public class ResourceServiceImpl implements ResourceService, ResourceCacheServic
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
     @javax.annotation.Resource
     private UserRoleRelationMapper userRoleRelationMapper;
-    @javax.annotation.Resource
-    private RedisTemplate<String, Object> redisTemplate;
-    private static final String USER_TOKEN_HASH_KEY = "USER_TOKEN_HASH_KEY";
 
     /**
      * 新增资源
@@ -236,16 +231,9 @@ public class ResourceServiceImpl implements ResourceService, ResourceCacheServic
      */
     @Override
     public List<ResourceVo> getResourceByUserId(String userId) {
-        HashOperations<String, Object, Object> opsForHash = redisTemplate.opsForHash();
-        List<ResourceVo> resourceVos = (List<ResourceVo>) opsForHash.get(USER_TOKEN_HASH_KEY, userId);
-        if (resourceVos == null) {
-            List<UserRoleRelation> userRoleRelations = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, userId));
-            List<RoleResourceRelation> roleResourceRelations = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, userRoleRelations.stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList())));
-            List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>().in(Resource::getId, roleResourceRelations.stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList())));
-            resourceVos = CommonUtils.transformList(resources, ResourceVo.class);
-            opsForHash.put(USER_TOKEN_HASH_KEY, userId, resourceVos);
-            return resourceVos;
-        }
-        return resourceVos;
+        List<UserRoleRelation> userRoleRelations = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, userId));
+        List<RoleResourceRelation> roleResourceRelations = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, userRoleRelations.stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList())));
+        List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>().in(Resource::getId, roleResourceRelations.stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList())));
+        return CommonUtils.transformList(resources, ResourceVo.class);
     }
 }

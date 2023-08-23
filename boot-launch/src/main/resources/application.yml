@@ -1,5 +1,5 @@
 server:
-  port: 8091
+  port: 8090
 
 spring:
   application:
@@ -20,7 +20,7 @@ mybatis:
     map-underscore-to-camel-case: true
 
 common:
-  skipUrl: /base/login,/base/register,/base/logout
+  skipUrl: /base/login,/base/register,/base/logout,/base/image/captcha,/base/publicKey
 
 key:
   encrypt:
