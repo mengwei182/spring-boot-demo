@@ -30,9 +30,6 @@ public class UserContextFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.addHeader("Content-type", "application/json");
         String authorizationHeader = request.getHeader(BaseFilter.AUTHORIZATION);
         String authorizationParameter = request.getParameter(BaseFilter.AUTHORIZATION);
         String authorization = StringUtils.hasLength(authorizationHeader) ? authorizationHeader : authorizationParameter;
