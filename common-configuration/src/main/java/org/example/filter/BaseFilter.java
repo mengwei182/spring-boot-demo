@@ -1,8 +1,9 @@
 package org.example.filter;
 
-import org.example.entity.system.vo.ResourceVo;
+import lombok.extern.slf4j.Slf4j;
 import org.example.entity.base.vo.TokenVo;
 import org.example.entity.base.vo.UserInfoVo;
+import org.example.entity.system.vo.ResourceVo;
 import org.example.model.CommonResult;
 import org.example.properties.CommonProperties;
 import org.example.util.GsonUtils;
@@ -30,6 +31,7 @@ import java.util.Optional;
  * @author lihui
  * @since 2022/10/26
  */
+@Slf4j
 @WebFilter
 @Component
 @Order(Integer.MIN_VALUE)
@@ -100,9 +102,13 @@ public class BaseFilter implements Filter {
         if (userInfoVo == null) {
             return false;
         }
-        // token过期
-        Object token = redisTemplate.opsForValue().get(userInfoVo.getId());
-        return token != null;
+        try {
+            // token过期
+            return redisTemplate.opsForValue().get(userInfoVo.getId()) != null;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     private boolean resourceFilter(UserInfoVo userInfoVo, HttpServletRequest request) {
