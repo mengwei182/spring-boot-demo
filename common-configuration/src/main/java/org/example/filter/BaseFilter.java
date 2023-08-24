@@ -41,6 +41,7 @@ public class BaseFilter implements Filter {
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
     public static final String AUTHORIZATION = "Authorization";
+    private static final String USER_TOKEN_KEY = "USER_TOKEN_KEY_";
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -69,7 +70,7 @@ public class BaseFilter implements Filter {
         TokenVo<UserInfoVo> tokenVo = TokenUtils.unsigned(authorization, UserInfoVo.class);
         UserInfoVo userInfoVo = tokenVo.getData();
         // 校验token
-        if (!tokenFilter(userInfoVo)) {
+        if (!tokenFilter(authorization, userInfoVo)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().print(GsonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
@@ -97,14 +98,15 @@ public class BaseFilter implements Filter {
         return StringUtils.hasLength(authorizationHeader) ? authorizationHeader : authorizationParameter;
     }
 
-    private boolean tokenFilter(UserInfoVo userInfoVo) {
+    private boolean tokenFilter(String authorization, UserInfoVo userInfoVo) {
         // 校验请求中的token参数和数据
         if (userInfoVo == null) {
             return false;
         }
         try {
             // token过期
-            return redisTemplate.opsForValue().get(userInfoVo.getId()) != null;
+            String token = (String) redisTemplate.opsForValue().get(USER_TOKEN_KEY + userInfoVo.getId());
+            return StringUtils.hasLength(token) && authorization.equals(token);
         } catch (Exception e) {
             log.error(e.getMessage());
             return false;
