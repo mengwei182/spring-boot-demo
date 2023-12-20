@@ -1,5 +1,6 @@
 package org.example.filter;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.base.vo.TokenVo;
 import org.example.entity.base.vo.UserInfoVo;
@@ -13,7 +14,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.*;
@@ -62,7 +62,7 @@ public class BaseFilter implements Filter {
         }
         // 校验请求中的token参数和数据
         String authorization = authorizationHeaderFilter(request);
-        if (!StringUtils.hasLength(authorization)) {
+        if (StrUtil.isEmpty(authorization)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().print(GsonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
@@ -95,7 +95,7 @@ public class BaseFilter implements Filter {
         // 校验请求中的token参数和数据
         String authorizationHeader = request.getHeader(AUTHORIZATION);
         String authorizationParameter = request.getParameter(AUTHORIZATION);
-        return StringUtils.hasLength(authorizationHeader) ? authorizationHeader : authorizationParameter;
+        return !StrUtil.isEmpty(authorizationHeader) ? authorizationHeader : authorizationParameter;
     }
 
     private boolean tokenFilter(String authorization, UserInfoVo userInfoVo) {
@@ -106,7 +106,7 @@ public class BaseFilter implements Filter {
         try {
             // token过期
             String token = (String) redisTemplate.opsForValue().get(USER_TOKEN_KEY + userInfoVo.getId());
-            return StringUtils.hasLength(token) && authorization.equals(token);
+            return !StrUtil.isEmpty(token) && authorization.equals(token);
         } catch (Exception e) {
             log.error(e.getMessage());
             return false;
