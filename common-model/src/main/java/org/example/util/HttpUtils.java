@@ -1,5 +1,6 @@
 package org.example.util;
 
+import cn.hutool.core.io.IoUtil;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
@@ -143,9 +144,9 @@ public class HttpUtils {
         public Void handleResponse(ClassicHttpResponse classicHttpResponse) throws IOException {
             FileOutputStream fos = new FileOutputStream(this.filepath);
             InputStream is = classicHttpResponse.getEntity().getContent();
-            IOUtils.copy(is, fos);
-            IOUtils.closeQuietly(fos);
-            IOUtils.closeQuietly(is);
+            IoUtil.copy(is, fos);
+            IoUtil.close(fos);
+            IoUtil.close(is);
             return null;
         }
     }
