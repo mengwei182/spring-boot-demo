@@ -18,7 +18,6 @@ import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.util.Timeout;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
