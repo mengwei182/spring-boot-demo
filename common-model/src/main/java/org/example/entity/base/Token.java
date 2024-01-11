@@ -1,4 +1,4 @@
-package org.example.entity.base.vo;
+package org.example.entity.base;
 
 import lombok.Data;
 
@@ -9,17 +9,17 @@ import java.util.Date;
  * @since 2022/10/29
  */
 @Data
-public class TokenVo<T> {
+public class Token<T> {
     private Object id;
     // 签名时间
     private Date signTime;
     // token数据
     private T data;
 
-    public TokenVo() {
+    public Token() {
     }
 
-    public TokenVo(Object id, Date signTime, T data) {
+    public Token(Object id, Date signTime, T data) {
         this.id = id;
         this.signTime = signTime;
         this.data = data;

@@ -20,7 +20,7 @@ public class Menu extends BaseEntity {
     /**
      * 名称
      */
-    @TreeModelField(field = TreeModelFieldEnum.LABEL)
+    @TreeModelField(TreeModelFieldEnum.LABEL)
     private String name;
     /**
      * 路由地址
@@ -33,7 +33,7 @@ public class Menu extends BaseEntity {
     /**
      * 父级id
      */
-    @TreeModelField(field = TreeModelFieldEnum.PARENT_ID)
+    @TreeModelField(TreeModelFieldEnum.PARENT_ID)
     private String parentId;
     /**
      * 类型

@@ -2,7 +2,6 @@ package org.example.filter;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.base.vo.TokenVo;
 import org.example.entity.base.vo.UserInfoVo;
 import org.example.properties.CommonProperties;
 import org.example.usercontext.UserContext;
@@ -47,9 +46,7 @@ public class UserContextFilter implements Filter {
             return;
         }
         try {
-            TokenVo<UserInfoVo> tokenVo = TokenUtils.unsigned(authorization, UserInfoVo.class);
-            UserInfoVo userInfoVo = tokenVo.getData();
-            UserContext.set(userInfoVo.getId(), userInfoVo.getUsername(), userInfoVo);
+            UserContext.set(TokenUtils.unsigned(authorization, UserInfoVo.class).getData());
         } catch (Exception e) {
             log.error(e.getMessage());
         } finally {

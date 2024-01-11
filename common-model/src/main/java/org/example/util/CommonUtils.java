@@ -3,9 +3,11 @@ package org.example.util;
 import cn.hutool.core.collection.CollectionUtil;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cglib.beans.BeanMap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -19,7 +21,7 @@ public class CommonUtils {
     /**
      * 生成uuid
      *
-     * @return
+     * @return 去除“-”的uuid
      */
     public static String uuid() {
         return UUID.randomUUID().toString().replaceAll("-", "");
@@ -28,10 +30,10 @@ public class CommonUtils {
     /**
      * 转换list成目标类型集合
      *
-     * @param list
-     * @param clazz
-     * @param <T>
-     * @return
+     * @param list 待转换的集合
+     * @param clazz 目标类型
+     * @param <T> 类型泛型
+     * @return 转换后的集合
      */
     public static <T> List<T> transformList(List<?> list, Class<T> clazz) {
         List<T> resultList = new ArrayList<>();
@@ -39,13 +41,7 @@ public class CommonUtils {
             return resultList;
         }
         for (Object object : list) {
-            try {
-                T t = clazz.getConstructor().newInstance();
-                BeanUtils.copyProperties(object, t);
-                resultList.add(t);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            resultList.add(transformObject(object, clazz));
         }
         return resultList;
     }
@@ -53,10 +49,10 @@ public class CommonUtils {
     /**
      * 转换object成目标类型对象
      *
-     * @param object
-     * @param clazz
-     * @param <T>
-     * @return
+     * @param object 待转换的对象
+     * @param clazz 目标类型
+     * @param <T> 类型泛型
+     * @return 转换后的对象
      */
     public static <T> T transformObject(Object object, Class<T> clazz) {
         if (object == null) {
@@ -64,14 +60,15 @@ public class CommonUtils {
         }
         try {
             T t = clazz.getConstructor().newInstance();
-            BeanUtils.copyProperties(object, t);
+            if (object instanceof Map<?, ?>) {
+                BeanMap beanMap = BeanMap.create(t);
+                beanMap.putAll((Map<?, ?>) object);
+            } else {
+                BeanUtils.copyProperties(object, t);
+            }
             return t;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public static <T> T fromJson(String json, Class<T> clazz) {
-        return GsonUtils.gson().fromJson(json, TypeToken.get(clazz));
     }
 }

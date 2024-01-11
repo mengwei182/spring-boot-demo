@@ -2,7 +2,7 @@ package org.example.filter;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.base.vo.TokenVo;
+import org.example.entity.base.Token;
 import org.example.entity.base.vo.UserInfoVo;
 import org.example.entity.system.vo.ResourceVo;
 import org.example.model.CommonResult;
@@ -67,8 +67,8 @@ public class BaseFilter implements Filter {
             response.getWriter().print(GsonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
         }
-        TokenVo<UserInfoVo> tokenVo = TokenUtils.unsigned(authorization, UserInfoVo.class);
-        UserInfoVo userInfoVo = tokenVo.getData();
+        Token<UserInfoVo> token = TokenUtils.unsigned(authorization, UserInfoVo.class);
+        UserInfoVo userInfoVo = token.getData();
         // 校验token
         if (!tokenFilter(authorization, userInfoVo)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

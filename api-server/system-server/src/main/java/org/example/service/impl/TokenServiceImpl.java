@@ -1,6 +1,6 @@
 package org.example.service.impl;
 
-import org.example.entity.base.vo.TokenVo;
+import org.example.entity.base.Token;
 import org.example.entity.base.vo.UserInfoVo;
 import org.example.error.SystemServerResult;
 import org.example.error.exception.CommonException;
@@ -46,15 +46,14 @@ public class TokenServiceImpl implements TokenService {
         if (expiration > maxExpiration) {
             throw new CommonException(SystemServerResult.TOKEN_EXPIRATION_TIMEOUT_MAX);
         }
-        String userId = UserContext.get().getUserId();
-        UserInfoVo userInfoVo = UserContext.get().getUserInfoVo();
+        UserInfoVo userInfoVo = UserContext.get();
+        String userId = userInfoVo.getId();
         // 删除已存储的用户token
         redisTemplate.delete(userId);
         userInfoVo.setLoginTime(date);
-        TokenVo<?> tokenVo = new TokenVo<>(userId, date, userInfoVo);
-        String token = TokenUtils.sign(tokenVo);
+        Token<?> token = new Token<>(userId, date, userInfoVo);
         // 重新设置token
         redisTemplate.opsForValue().set(userId, token, 60 * 60, TimeUnit.SECONDS);
-        return token;
+        return TokenUtils.sign(token);
     }
 }
