@@ -1,6 +1,5 @@
 package org.example.util;
 
-import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.base.Token;
 import org.springframework.beans.BeanUtils;
@@ -64,7 +63,7 @@ public class TokenUtils {
     public static Token<?> unsigned(String token) {
         try {
             byte[] bytes = decryptCipher.doFinal(Base64.getDecoder().decode(token.getBytes()));
-            return GsonUtils.gson().fromJson(new String(bytes), TypeToken.get(Token.class));
+            return GsonUtils.gson().fromJson(new String(bytes), Token.class);
         } catch (Exception e) {
             log.error(e.getMessage());
             return new Token<>();

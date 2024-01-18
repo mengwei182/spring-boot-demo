@@ -1,7 +1,6 @@
 package org.example.util;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.google.gson.reflect.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cglib.beans.BeanMap;
 
