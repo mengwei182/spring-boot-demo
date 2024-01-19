@@ -1,5 +1,8 @@
 package org.example.global;
 
+import lombok.Getter;
+
+@Getter
 public enum ResultCode {
     SUCCESS(200, "SUCCESS"),
     UNAUTHORIZED(401, "UNAUTHORIZED"),
@@ -11,13 +14,5 @@ public enum ResultCode {
     ResultCode(Integer code, String name) {
         this.code = code;
         this.name = name;
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public String getName() {
-        return name;
     }
 }
