@@ -1,7 +1,8 @@
 package org.example.service;
 
 /**
- * @author 三禾一研发中心后端组
+ * @author lihui
+ * @since 2023/4/3
  */
 public interface TokenService {
     /**

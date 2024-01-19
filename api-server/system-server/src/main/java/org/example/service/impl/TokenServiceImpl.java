@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import org.example.CaffeineRedisCache;
 import org.example.entity.base.Token;
 import org.example.entity.base.vo.UserInfoVo;
 import org.example.error.SystemServerResult;
@@ -7,21 +8,21 @@ import org.example.error.exception.CommonException;
 import org.example.service.TokenService;
 import org.example.usercontext.UserContext;
 import org.example.util.TokenUtils;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 /**
- * @author 三禾一研发中心后端组
+ * @author lihui
+ * @since 2023/4/3
  */
 @Service
 public class TokenServiceImpl implements TokenService {
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private CaffeineRedisCache caffeineRedisCache;
 
     /**
      * 刷新token
@@ -49,11 +50,11 @@ public class TokenServiceImpl implements TokenService {
         UserInfoVo userInfoVo = UserContext.get();
         String userId = userInfoVo.getId();
         // 删除已存储的用户token
-        redisTemplate.delete(userId);
+        caffeineRedisCache.evict(userId);
         userInfoVo.setLoginTime(date);
         Token<?> token = new Token<>(userId, date, userInfoVo);
         // 重新设置token
-        redisTemplate.opsForValue().set(userId, token, 60 * 60, TimeUnit.SECONDS);
+        caffeineRedisCache.put(userId, token, Duration.ofSeconds(60 * 60));
         return TokenUtils.sign(token);
     }
 }

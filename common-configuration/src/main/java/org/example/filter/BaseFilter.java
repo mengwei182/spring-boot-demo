@@ -2,6 +2,7 @@ package org.example.filter;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.example.CaffeineRedisCache;
 import org.example.entity.base.Token;
 import org.example.entity.base.vo.UserInfoVo;
 import org.example.entity.system.vo.ResourceVo;
@@ -10,7 +11,6 @@ import org.example.properties.CommonProperties;
 import org.example.util.GsonUtils;
 import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
@@ -41,7 +41,7 @@ public class BaseFilter implements Filter {
     @Resource
     private CommonProperties commonProperties;
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private CaffeineRedisCache caffeineRedisCache;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -105,7 +105,7 @@ public class BaseFilter implements Filter {
         }
         try {
             // token过期
-            String token = (String) redisTemplate.opsForValue().get(USER_TOKEN_KEY + userInfoVo.getId());
+            String token = caffeineRedisCache.get(USER_TOKEN_KEY + userInfoVo.getId(), String.class);
             return !StrUtil.isEmpty(token) && authorization.equals(token);
         } catch (Exception e) {
             log.error(e.getMessage());

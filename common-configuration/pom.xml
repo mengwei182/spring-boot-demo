@@ -52,6 +52,13 @@
             <version>${mybatis.plus.boot.starter.version}</version>
         </dependency>
         <!--mybatis end-->
+
+        <!--caffeine redis start-->
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>caffeine-redis-boot-starter</artifactId>
+        </dependency>
+        <!--caffeine redis end-->
     </dependencies>
 
     <build>
