@@ -87,7 +87,7 @@ public class BaseFilter implements Filter {
         String servletPath = request.getServletPath();
         AntPathMatcher antPathMatcher = new AntPathMatcher();
         // 校验是否是不需要验证token的url
-        Optional<String> first = Arrays.stream(commonProperties.getSkipUrl().split(",")).filter(o -> antPathMatcher.match(o, servletPath)).findFirst();
+        Optional<String> first = commonProperties.getSkipUrl().stream().filter(o -> antPathMatcher.match(o, servletPath)).findFirst();
         return first.isPresent();
     }
 

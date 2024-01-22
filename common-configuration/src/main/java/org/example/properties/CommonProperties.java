@@ -4,6 +4,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * @author lihui
  * @since 2023/4/3
@@ -12,5 +14,5 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "common")
 public class CommonProperties {
-    private String skipUrl;
+    private List<String> skipUrl;
 }

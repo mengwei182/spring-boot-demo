@@ -18,11 +18,41 @@
         <module>system-server</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <!--module start-->
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>common-model</artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>common-configuration</artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>system-server</artifactId>
+                <version>1.0</version>
+            </dependency>
+            <!--module end-->
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!--module start-->
         <dependency>
             <groupId>org.example</groupId>
             <artifactId>common-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>common-configuration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.example</groupId>
+            <artifactId>system-server</artifactId>
         </dependency>
         <!--module end-->
 
