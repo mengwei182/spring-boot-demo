@@ -3,8 +3,8 @@ package org.example.entity.system.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.base.BaseEntity;
-import org.example.error.CommonServerResult;
-import org.example.error.SystemServerResult;
+import org.example.result.CommonServerResult;
+import org.example.result.SystemServerResult;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

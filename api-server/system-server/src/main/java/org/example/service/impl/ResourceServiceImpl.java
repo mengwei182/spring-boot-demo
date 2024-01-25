@@ -1,8 +1,10 @@
 package org.example.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.example.CaffeineRedisCache;
 import org.example.api.ResourceQueryPage;
 import org.example.entity.system.Resource;
 import org.example.entity.system.ResourceCategory;
@@ -10,15 +12,14 @@ import org.example.entity.system.RoleResourceRelation;
 import org.example.entity.system.UserRoleRelation;
 import org.example.entity.system.vo.ResourceCategoryVo;
 import org.example.entity.system.vo.ResourceVo;
-import org.example.error.SystemServerResult;
-import org.example.error.exception.CommonException;
 import org.example.mapper.ResourceCategoryMapper;
 import org.example.mapper.ResourceMapper;
 import org.example.mapper.RoleResourceRelationMapper;
 import org.example.mapper.UserRoleRelationMapper;
+import org.example.result.SystemServerResult;
+import org.example.result.exception.SystemException;
 import org.example.service.ResourceCategoryService;
 import org.example.service.ResourceService;
-import org.example.service.cache.ResourceCacheService;
 import org.example.util.CommonUtils;
 import org.example.util.PageUtils;
 import org.springframework.beans.BeanUtils;
@@ -31,6 +32,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 import org.springframework.web.util.pattern.PathPattern;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +44,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class ResourceServiceImpl implements ResourceService, ResourceCacheService {
+public class ResourceServiceImpl implements ResourceService {
     @Value("${spring.application.name}")
     private String applicationName;
     @javax.annotation.Resource
@@ -57,6 +59,8 @@ public class ResourceServiceImpl implements ResourceService, ResourceCacheServic
     private RequestMappingHandlerMapping requestMappingHandlerMapping;
     @javax.annotation.Resource
     private UserRoleRelationMapper userRoleRelationMapper;
+    @javax.annotation.Resource
+    private CaffeineRedisCache caffeineRedisCache;
 
     /**
      * 新增资源
@@ -68,11 +72,11 @@ public class ResourceServiceImpl implements ResourceService, ResourceCacheServic
     public Boolean addResource(ResourceVo resourceVo) {
         ResourceCategory resourceCategory = resourceCategoryMapper.selectById(resourceVo.getCategoryId());
         if (resourceCategory == null) {
-            throw new CommonException(SystemServerResult.CATEGORY_NOT_EXIST);
+            throw new SystemException(SystemServerResult.CATEGORY_NOT_EXIST);
         }
         Long count = resourceMapper.selectCount(new LambdaQueryWrapper<Resource>().eq(Resource::getCategoryId, resourceVo.getCategoryId()).eq(Resource::getName, resourceVo.getName()));
         if (count != null && count > 0) {
-            throw new CommonException(SystemServerResult.RESOURCE_NAME_DUPLICATE);
+            throw new SystemException(SystemServerResult.RESOURCE_NAME_DUPLICATE);
         }
         Resource resource = new Resource();
         BeanUtils.copyProperties(resourceVo, resource);
@@ -92,7 +96,7 @@ public class ResourceServiceImpl implements ResourceService, ResourceCacheServic
     public Boolean deleteResource(String id) {
         Resource resource = resourceMapper.selectById(id);
         if (resource == null) {
-            throw new CommonException(SystemServerResult.RESOURCE_NOT_EXIST);
+            throw new SystemException(SystemServerResult.RESOURCE_NOT_EXIST);
         }
         // 删除角色资源表的关联信息
         roleResourceRelationMapper.delete(new LambdaQueryWrapper<RoleResourceRelation>().eq(RoleResourceRelation::getResourceId, id));
@@ -110,15 +114,15 @@ public class ResourceServiceImpl implements ResourceService, ResourceCacheServic
     public Boolean updateResource(ResourceVo resourceVo) {
         Resource resource = resourceMapper.selectById(resourceVo.getId());
         if (resource == null) {
-            throw new CommonException(SystemServerResult.RESOURCE_NOT_EXIST);
+            throw new SystemException(SystemServerResult.RESOURCE_NOT_EXIST);
         }
         ResourceCategory resourceCategory = resourceCategoryMapper.selectById(resourceVo.getCategoryId());
         if (resourceCategory == null) {
-            throw new CommonException(SystemServerResult.CATEGORY_NOT_EXIST);
+            throw new SystemException(SystemServerResult.CATEGORY_NOT_EXIST);
         }
         Long count = resourceMapper.selectCount(new LambdaQueryWrapper<Resource>().eq(Resource::getCategoryId, resourceVo.getCategoryId()).eq(Resource::getName, resourceVo.getName()));
         if (count != null && count > 0) {
-            throw new CommonException(SystemServerResult.RESOURCE_NAME_DUPLICATE);
+            throw new SystemException(SystemServerResult.RESOURCE_NAME_DUPLICATE);
         }
         Resource insterResource = new Resource();
         BeanUtils.copyProperties(resourceVo, insterResource);
@@ -231,9 +235,25 @@ public class ResourceServiceImpl implements ResourceService, ResourceCacheServic
      */
     @Override
     public List<ResourceVo> getResourceByUserId(String userId) {
-        List<UserRoleRelation> userRoleRelations = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, userId));
-        List<RoleResourceRelation> roleResourceRelations = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, userRoleRelations.stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList())));
-        List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>().in(Resource::getId, roleResourceRelations.stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList())));
-        return CommonUtils.transformList(resources, ResourceVo.class);
+        String key = SystemServerResult.RESOURCE_KEY + userId;
+        List<ResourceVo> resourceVos = (List<ResourceVo>) caffeineRedisCache.get(key, List.class);
+        if (CollectionUtil.isEmpty(resourceVos)) {
+            List<UserRoleRelation> userRoleRelations = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, userId));
+            List<RoleResourceRelation> roleResourceRelations = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, userRoleRelations.stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList())));
+            List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>().in(Resource::getId, roleResourceRelations.stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList())));
+            resourceVos = CommonUtils.transformList(resources, ResourceVo.class);
+        }
+        caffeineRedisCache.put(key, resourceVos, Duration.ofHours(1));
+        return resourceVos;
+    }
+
+    /**
+     * 清理全部缓存
+     *
+     * @param ids 可以关联到缓存的关键字，如userId
+     */
+    @Override
+    public void clear(Object... ids) {
+        caffeineRedisCache.evict(SystemServerResult.RESOURCE_KEY + ids[0]);
     }
 }

@@ -1,13 +1,16 @@
 package org.example.filter;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
 import org.example.entity.base.Token;
-import org.example.entity.base.vo.UserInfoVo;
 import org.example.entity.system.vo.ResourceVo;
+import org.example.entity.system.vo.UserVo;
 import org.example.model.CommonResult;
 import org.example.properties.CommonProperties;
+import org.example.result.CommonServerResult;
+import org.example.result.SystemServerResult;
 import org.example.util.GsonUtils;
 import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
@@ -21,7 +24,6 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +38,6 @@ import java.util.Optional;
 @Component
 @Order(Integer.MIN_VALUE)
 public class BaseFilter implements Filter {
-    public static final String AUTHORIZATION = "Authorization";
-    private static final String USER_TOKEN_KEY = "USER_TOKEN_KEY_";
     @Resource
     private CommonProperties commonProperties;
     @Resource
@@ -67,16 +67,16 @@ public class BaseFilter implements Filter {
             response.getWriter().print(GsonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
         }
-        Token<UserInfoVo> token = TokenUtils.unsigned(authorization, UserInfoVo.class);
-        UserInfoVo userInfoVo = token.getData();
+        Token<UserVo> token = TokenUtils.unsigned(authorization, UserVo.class);
+        UserVo userVo = token.getData();
         // 校验token
-        if (!tokenFilter(authorization, userInfoVo)) {
+        if (!tokenFilter(authorization, userVo)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().print(GsonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
         }
         // 校验资源
-        if (!resourceFilter(userInfoVo, request)) {
+        if (!resourceFilter(userVo, request)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().print(GsonUtils.gson().toJson(CommonResult.unauthorized()));
         }
@@ -93,19 +93,19 @@ public class BaseFilter implements Filter {
 
     private String authorizationHeaderFilter(HttpServletRequest request) {
         // 校验请求中的token参数和数据
-        String authorizationHeader = request.getHeader(AUTHORIZATION);
-        String authorizationParameter = request.getParameter(AUTHORIZATION);
+        String authorizationHeader = request.getHeader(CommonServerResult.AUTHORIZATION);
+        String authorizationParameter = request.getParameter(CommonServerResult.AUTHORIZATION);
         return !StrUtil.isEmpty(authorizationHeader) ? authorizationHeader : authorizationParameter;
     }
 
-    private boolean tokenFilter(String authorization, UserInfoVo userInfoVo) {
+    private boolean tokenFilter(String authorization, UserVo userVo) {
         // 校验请求中的token参数和数据
-        if (userInfoVo == null) {
+        if (userVo == null) {
             return false;
         }
         try {
             // token过期
-            String token = caffeineRedisCache.get(USER_TOKEN_KEY + userInfoVo.getId(), String.class);
+            String token = caffeineRedisCache.get(SystemServerResult.USER_TOKEN_KEY + userVo.getId(), String.class);
             return !StrUtil.isEmpty(token) && authorization.equals(token);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -113,10 +113,13 @@ public class BaseFilter implements Filter {
         }
     }
 
-    private boolean resourceFilter(UserInfoVo userInfoVo, HttpServletRequest request) {
+    private boolean resourceFilter(UserVo userVo, HttpServletRequest request) {
         String servletPath = request.getServletPath();
         AntPathMatcher antPathMatcher = new AntPathMatcher();
-        List<ResourceVo> resourceVos = userInfoVo.getResources();
+        List<ResourceVo> resourceVos = userVo.getResources();
+        if (CollectionUtil.isEmpty(resourceVos)) {
+            return false;
+        }
         Optional<ResourceVo> findAny = resourceVos.stream().filter(o -> antPathMatcher.match(o.getUrl(), servletPath)).findAny();
         return findAny.isPresent();
     }

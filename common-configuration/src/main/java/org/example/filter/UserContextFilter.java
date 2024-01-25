@@ -2,8 +2,9 @@ package org.example.filter;
 
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.base.vo.UserInfoVo;
+import org.example.entity.system.vo.UserVo;
 import org.example.properties.CommonProperties;
+import org.example.result.CommonServerResult;
 import org.example.usercontext.UserContext;
 import org.example.util.TokenUtils;
 import org.springframework.core.annotation.Order;
@@ -16,7 +17,6 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 
 /**
@@ -37,8 +37,8 @@ public class UserContextFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        String authorizationHeader = request.getHeader(BaseFilter.AUTHORIZATION);
-        String authorizationParameter = request.getParameter(BaseFilter.AUTHORIZATION);
+        String authorizationHeader = request.getHeader(CommonServerResult.AUTHORIZATION);
+        String authorizationParameter = request.getParameter(CommonServerResult.AUTHORIZATION);
         String authorization = !StrUtil.isEmpty(authorizationHeader) ? authorizationHeader : authorizationParameter;
         // 校验是否是不需要验证token的url
         if (urlWhiteFilter(request)) {
@@ -46,7 +46,7 @@ public class UserContextFilter implements Filter {
             return;
         }
         try {
-            UserContext.set(TokenUtils.unsigned(authorization, UserInfoVo.class).getData());
+            UserContext.set(TokenUtils.unsigned(authorization, UserVo.class).getData());
         } catch (Exception e) {
             log.error(e.getMessage());
         } finally {

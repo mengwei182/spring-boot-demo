@@ -2,6 +2,7 @@ package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.example.api.ResourceQueryPage;
+import org.example.cache.CacheService;
 import org.example.entity.system.vo.ResourceVo;
 import org.springframework.scheduling.annotation.Async;
 
@@ -11,7 +12,7 @@ import java.util.List;
  * @author lihui
  * @since 2023/4/3
  */
-public interface ResourceService {
+public interface ResourceService extends CacheService {
     /**
      * 新增资源
      *
@@ -72,4 +73,12 @@ public interface ResourceService {
      */
     @Async
     void refreshResource();
+
+    /**
+     * 根据用户id获取资源列表
+     *
+     * @param userId
+     * @return
+     */
+    List<ResourceVo> getResourceByUserId(String userId);
 }

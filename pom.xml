@@ -114,6 +114,11 @@
                 <artifactId>common-configuration</artifactId>
                 <version>1.0</version>
             </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>system-server</artifactId>
+                <version>1.0</version>
+            </dependency>
             <!--module end-->
 
             <!--caffeine redis start-->

@@ -24,9 +24,7 @@ common:
     [
       /base/login,
       /base/register,
-      /base/logout,
-      /base/image/captcha,
-      /base/publicKey
+      /base/image/captcha
     ]
 
 key:

@@ -9,11 +9,11 @@ import org.example.entity.base.BaseEntity;
 import org.example.entity.system.Menu;
 import org.example.entity.system.RoleMenuRelation;
 import org.example.entity.system.vo.MenuVo;
-import org.example.error.CommonServerResult;
-import org.example.error.SystemServerResult;
-import org.example.error.exception.CommonException;
 import org.example.mapper.MenuMapper;
 import org.example.mapper.RoleMenuRelationMapper;
+import org.example.result.CommonServerResult;
+import org.example.result.SystemServerResult;
+import org.example.result.exception.SystemException;
 import org.example.service.MenuService;
 import org.example.util.CommonUtils;
 import org.example.util.PageUtils;
@@ -53,7 +53,7 @@ public class MenuServiceImpl implements MenuService {
         if (!StrUtil.isEmpty(menuVo.getParentId())) {
             Menu parentMenu = menuMapper.selectOne(queryWrapper.eq(Menu::getId, menuVo.getParentId()));
             if (parentMenu == null) {
-                throw new CommonException(SystemServerResult.PARENT_NOT_EXIST);
+                throw new SystemException(SystemServerResult.PARENT_NOT_EXIST);
             }
             parentId = menuVo.getParentId();
             menu.setIdChain(parentMenu.getIdChain() + "," + parentMenu.getId());
@@ -65,7 +65,7 @@ public class MenuServiceImpl implements MenuService {
         }
         Menu resultMenu = menuMapper.selectOne(queryWrapper.eq(Menu::getParentId, parentId).eq(Menu::getName, menuVo.getName()));
         if (resultMenu != null) {
-            throw new CommonException(SystemServerResult.MENU_NAME_EXIST);
+            throw new SystemException(SystemServerResult.MENU_NAME_EXIST);
         }
         menuMapper.insert(menu);
         return true;
@@ -82,7 +82,7 @@ public class MenuServiceImpl implements MenuService {
     public Boolean deleteMenu(String id) {
         Menu menu = menuMapper.selectById(id);
         if (menu == null) {
-            throw new CommonException(CommonServerResult.OBJECT_NOT_EXIST);
+            throw new SystemException(CommonServerResult.OBJECT_NOT_EXIST);
         }
         menuMapper.deleteById(id);
         QueryWrapper<RoleMenuRelation> roleMenuRelationQueryWrapper = new QueryWrapper<>();
@@ -101,7 +101,7 @@ public class MenuServiceImpl implements MenuService {
     public Boolean updateMenu(MenuVo menuVo) {
         Menu menu = menuMapper.selectById(menuVo.getId());
         if (menu == null) {
-            throw new CommonException(CommonServerResult.OBJECT_NOT_EXIST);
+            throw new SystemException(CommonServerResult.OBJECT_NOT_EXIST);
         }
         BeanUtils.copyProperties(menuVo, menu);
         String parentId = BaseEntity.TOP_PARENT_ID;
@@ -110,7 +110,7 @@ public class MenuServiceImpl implements MenuService {
         if (!StrUtil.isEmpty(menuVo.getParentId())) {
             Menu parentMenu = menuMapper.selectOne(queryWrapper.eq(Menu::getId, menuVo.getParentId()));
             if (parentMenu == null) {
-                throw new CommonException(SystemServerResult.PARENT_NOT_EXIST);
+                throw new SystemException(SystemServerResult.PARENT_NOT_EXIST);
             }
             parentId = menuVo.getParentId();
             menu.setIdChain(parentMenu.getIdChain() + "," + parentMenu.getId());
@@ -122,7 +122,7 @@ public class MenuServiceImpl implements MenuService {
         }
         Menu resultMenu = menuMapper.selectOne(queryWrapper.eq(Menu::getParentId, parentId).eq(Menu::getName, menuVo.getName()));
         if (resultMenu != null) {
-            throw new CommonException(SystemServerResult.MENU_NAME_EXIST);
+            throw new SystemException(SystemServerResult.MENU_NAME_EXIST);
         }
         menuMapper.updateById(menu);
         return true;
