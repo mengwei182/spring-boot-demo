@@ -156,6 +156,7 @@ public class BaseServiceImpl implements BaseService {
         Token<UserVo> token = new Token<>(user.getId(), new Date(), userVo);
         String tokenString = TokenUtils.sign(token);
         userService.clear(user.getId());
+        caffeineRedisCache.put(user.getId(), userVo, Duration.ofMillis(time));
         caffeineRedisCache.put(SystemServerResult.USER_TOKEN_KEY + user.getId(), tokenString, Duration.ofMillis(time));
         return tokenString;
     }

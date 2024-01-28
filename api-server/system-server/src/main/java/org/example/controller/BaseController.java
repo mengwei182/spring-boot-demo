@@ -1,12 +1,13 @@
 package org.example.controller;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.example.entity.system.vo.UsernamePasswordVo;
 import org.example.model.CommonResult;
 import org.example.service.BaseService;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import java.io.IOException;
  * @author lihui
  * @since 2023/4/8
  */
+@Api(tags = "基础管理")
 @RestController
 @RequestMapping("/base")
 public class BaseController {
@@ -31,7 +33,8 @@ public class BaseController {
      * @param usernamePasswordVo
      * @return
      */
-    @RequestMapping("/login")
+    @ApiOperation("登录")
+    @PostMapping(value = "/login")
     public CommonResult<String> login(HttpServletRequest request, @Valid @RequestBody UsernamePasswordVo usernamePasswordVo) {
         return CommonResult.success(baseService.login(request, usernamePasswordVo));
     }
@@ -41,7 +44,8 @@ public class BaseController {
      *
      * @return
      */
-    @RequestMapping("/logout")
+    @ApiOperation("登出")
+    @GetMapping("/logout")
     public CommonResult<Boolean> logout() {
         return CommonResult.success(baseService.logout());
     }
@@ -56,7 +60,8 @@ public class BaseController {
      * @param captchaSize 验证码位数
      * @throws IOException
      */
-    @RequestMapping("/image/captcha")
+    @ApiOperation("获取图片验证码")
+    @GetMapping("/image/captcha")
     public void getImageCaptcha(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "130") Integer width, @RequestParam(defaultValue = "30") Integer height, @RequestParam(defaultValue = "4") Integer captchaSize) throws IOException {
         baseService.generateImageCaptcha(request, response, width, height, captchaSize);
     }

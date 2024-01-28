@@ -3,6 +3,8 @@ package org.example.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.example.api.RoleQueryPage;
 import org.example.entity.system.Role;
 import org.example.entity.system.RoleMenuRelation;
 import org.example.entity.system.UserRoleRelation;
@@ -16,6 +18,7 @@ import org.example.result.SystemServerResult;
 import org.example.result.exception.SystemException;
 import org.example.service.RoleService;
 import org.example.util.CommonUtils;
+import org.example.util.PageUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -124,5 +127,30 @@ public class RoleServiceImpl implements RoleService {
             });
         }
         return true;
+    }
+
+    /**
+     * 查询角色列表
+     *
+     * @param queryPage
+     * @return
+     */
+    @Override
+    public Page<RoleVo> getRoleList(RoleQueryPage queryPage) {
+        Page<Role> page = new Page<>(queryPage.getPageNumber(), queryPage.getPageSize());
+        List<Role> roleList = roleMapper.getRoleList(page, queryPage);
+        page.setRecords(roleList);
+        return PageUtils.wrap(page, RoleVo.class);
+    }
+
+    /**
+     * 查询所有角色列表
+     *
+     * @return
+     */
+    @Override
+    public List<RoleVo> getAllRoleList() {
+        List<Role> menus = roleMapper.selectList(new LambdaQueryWrapper<>());
+        return CommonUtils.transformList(menus, RoleVo.class);
     }
 }

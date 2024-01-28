@@ -1,7 +1,11 @@
 package org.example.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.example.api.RoleQueryPage;
 import org.example.entity.system.vo.RoleMenuRelationVo;
 import org.example.entity.system.vo.RoleVo;
+
+import java.util.List;
 
 /**
  * @author lihui
@@ -39,4 +43,19 @@ public interface RoleService {
      * @return
      */
     Boolean addRoleMenu(RoleMenuRelationVo roleMenuRelationVo);
+
+    /**
+     * 查询角色列表
+     *
+     * @param queryPage
+     * @return
+     */
+    Page<RoleVo> getRoleList(RoleQueryPage queryPage);
+
+    /**
+     * 查询所有角色列表
+     *
+     * @return
+     */
+    List<RoleVo> getAllRoleList();
 }
