@@ -3,8 +3,8 @@ package org.example.entity.system.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.base.BaseEntity;
-import org.example.util.tree.TreeModelField;
-import org.example.util.tree.TreeModelFieldEnum;
+import org.example.tree.TreeModelField;
+import org.example.tree.TreeModelFieldEnum;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

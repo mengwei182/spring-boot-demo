@@ -17,11 +17,12 @@
 
     <properties>
         <java.version>8</java.version>
+        <maven.compiler>${java.version}</maven.compiler>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <jedis.version>5.1.0</jedis.version>
         <mysql.version>8.0.33</mysql.version>
-        <spring.kafka.version>3.1.1</spring.kafka.version>
+        <spring.kafka.version>2.9.10</spring.kafka.version>
         <druid.spring.boot.starter.version>1.2.20</druid.spring.boot.starter.version>
         <mybatis.plus.boot.starter.version>3.5.4.1</mybatis.plus.boot.starter.version>
         <mybatis.spring.boot.starter.version>2.3.2</mybatis.spring.boot.starter.version>
@@ -30,7 +31,7 @@
     <modules>
         <module>boot-launch</module>
         <module>common-model</module>
-        <module>common-configuration</module>
+        <module>common-core</module>
         <module>api-server</module>
     </modules>
 
@@ -111,7 +112,7 @@
             </dependency>
             <dependency>
                 <groupId>org.example</groupId>
-                <artifactId>common-configuration</artifactId>
+                <artifactId>common-core</artifactId>
                 <version>1.0</version>
             </dependency>
             <dependency>

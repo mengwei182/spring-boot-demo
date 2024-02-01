@@ -1,4 +1,4 @@
-package org.example.util.tree;
+package org.example.tree;
 
 import java.lang.annotation.*;
 

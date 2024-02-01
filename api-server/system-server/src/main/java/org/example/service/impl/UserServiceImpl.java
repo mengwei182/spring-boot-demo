@@ -19,7 +19,7 @@ import org.example.usercontext.UserContext;
 import org.example.util.CommonUtils;
 import org.example.util.PageUtils;
 import org.example.util.RSAEncryptUtils;
-import org.example.util.tree.TreeModelUtils;
+import org.example.util.TreeModelUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

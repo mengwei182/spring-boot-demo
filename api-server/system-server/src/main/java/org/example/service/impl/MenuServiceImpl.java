@@ -17,7 +17,7 @@ import org.example.result.exception.SystemException;
 import org.example.service.MenuService;
 import org.example.util.CommonUtils;
 import org.example.util.PageUtils;
-import org.example.util.tree.TreeModelUtils;
+import org.example.util.TreeModelUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
