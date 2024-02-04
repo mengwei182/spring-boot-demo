@@ -18,7 +18,7 @@ spring:
         max-active: 8
         max-wait: 180000
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 172.21.137.17:9092
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
