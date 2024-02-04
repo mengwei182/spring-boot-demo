@@ -7,6 +7,5 @@ package org.example.mq;
 public class Topic {
     public static class KafkaTopic {
         public static final String DEFAULT_TOPIC = "topics_default_topic";
-        public static final String TEST_TOPIC = "topics_test_topic";
     }
 }
