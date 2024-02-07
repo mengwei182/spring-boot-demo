@@ -3,11 +3,11 @@ package org.example.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.ResourceCategoryQueryPage;
+import org.example.query.ResourceCategoryQueryPage;
 import org.example.entity.system.Resource;
 import org.example.entity.system.ResourceCategory;
-import org.example.entity.system.vo.ResourceCategoryVo;
-import org.example.entity.system.vo.ResourceVo;
+import org.example.entity.system.vo.ResourceCategoryVO;
+import org.example.entity.system.vo.ResourceVO;
 import org.example.mapper.ResourceCategoryMapper;
 import org.example.mapper.ResourceMapper;
 import org.example.result.SystemServerResult;
@@ -38,7 +38,7 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
      * @return
      */
     @Override
-    public ResourceCategoryVo addResourceCategory(ResourceCategoryVo resourceCategoryVo) {
+    public ResourceCategoryVO addResourceCategory(ResourceCategoryVO resourceCategoryVo) {
         QueryWrapper<ResourceCategory> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(ResourceCategory::getName, resourceCategoryVo.getName());
         ResourceCategory resourceCategory = resourceCategoryMapper.selectOne(queryWrapper);
@@ -80,7 +80,7 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
      * @return
      */
     @Override
-    public Boolean updateResourceCategory(ResourceCategoryVo resourceCategoryVo) {
+    public Boolean updateResourceCategory(ResourceCategoryVO resourceCategoryVo) {
         QueryWrapper<ResourceCategory> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(ResourceCategory::getName, resourceCategoryVo.getName());
         ResourceCategory resourceCategory = resourceCategoryMapper.selectOne(queryWrapper);
@@ -100,15 +100,15 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
      * @return
      */
     @Override
-    public Page<ResourceCategoryVo> getResourceCategoryList(ResourceCategoryQueryPage queryPage) {
+    public Page<ResourceCategoryVO> getResourceCategoryList(ResourceCategoryQueryPage queryPage) {
         Page<ResourceCategory> page = new Page<>(queryPage.getPageNumber(), queryPage.getPageSize());
         List<ResourceCategory> resourceCategories = resourceCategoryMapper.getResourceCategoryList(page, queryPage);
         page.setRecords(resourceCategories);
-        Page<ResourceCategoryVo> resltPage = PageUtils.wrap(page, ResourceCategoryVo.class);
-        List<ResourceCategoryVo> records = resltPage.getRecords();
-        for (ResourceCategoryVo record : records) {
+        Page<ResourceCategoryVO> resltPage = PageUtils.wrap(page, ResourceCategoryVO.class);
+        List<ResourceCategoryVO> records = resltPage.getRecords();
+        for (ResourceCategoryVO record : records) {
             List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>().eq(Resource::getCategoryId, record.getId()));
-            record.setResources(CommonUtils.transformList(resources, ResourceVo.class));
+            record.setResources(CommonUtils.transformList(resources, ResourceVO.class));
         }
         return resltPage;
     }
@@ -119,14 +119,14 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
      * @return
      */
     @Override
-    public List<ResourceCategoryVo> getAllResourceCategoryList() {
+    public List<ResourceCategoryVO> getAllResourceCategoryList() {
         List<ResourceCategory> resourceCategories = resourceCategoryMapper.selectList(new LambdaQueryWrapper<>());
-        List<ResourceCategoryVo> resourceCategoryVos = CommonUtils.transformList(resourceCategories, ResourceCategoryVo.class);
-        for (ResourceCategoryVo resourceCategoryVo : resourceCategoryVos) {
+        List<ResourceCategoryVO> resourceCategoryVOS = CommonUtils.transformList(resourceCategories, ResourceCategoryVO.class);
+        for (ResourceCategoryVO resourceCategoryVo : resourceCategoryVOS) {
             List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>().eq(Resource::getCategoryId, resourceCategoryVo.getId()));
-            resourceCategoryVo.setResources(CommonUtils.transformList(resources, ResourceVo.class));
+            resourceCategoryVo.setResources(CommonUtils.transformList(resources, ResourceVO.class));
         }
-        return resourceCategoryVos;
+        return resourceCategoryVOS;
     }
 
     /**
@@ -136,8 +136,8 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
      * @return
      */
     @Override
-    public ResourceCategoryVo getResourceCategoryByName(String name) {
+    public ResourceCategoryVO getResourceCategoryByName(String name) {
         ResourceCategory resourceCategory = resourceCategoryMapper.selectOne(new LambdaQueryWrapper<ResourceCategory>().eq(ResourceCategory::getName, name));
-        return CommonUtils.transformObject(resourceCategory, ResourceCategoryVo.class);
+        return CommonUtils.transformObject(resourceCategory, ResourceCategoryVO.class);
     }
 }

@@ -3,8 +3,8 @@ package org.example.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.example.api.MenuQueryPage;
-import org.example.entity.system.vo.MenuVo;
+import org.example.query.MenuQueryPage;
+import org.example.entity.system.vo.MenuVO;
 import org.example.model.CommonResult;
 import org.example.service.MenuService;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,7 @@ public class MenuController {
      */
     @ApiOperation("新增菜单")
     @PostMapping("/add")
-    public CommonResult<Boolean> addMenu(@RequestBody MenuVo menuVo) {
+    public CommonResult<Boolean> addMenu(@RequestBody MenuVO menuVo) {
         return CommonResult.success(menuService.addMenu(menuVo));
     }
 
@@ -55,7 +55,7 @@ public class MenuController {
      */
     @PutMapping("更新菜单")
     @RequestMapping("/update")
-    public CommonResult<Boolean> updateMenu(@RequestParam MenuVo menuVo) {
+    public CommonResult<Boolean> updateMenu(@RequestParam MenuVO menuVo) {
         return CommonResult.success(menuService.updateMenu(menuVo));
     }
 
@@ -67,7 +67,7 @@ public class MenuController {
      */
     @ApiOperation("查询菜单列表")
     @GetMapping("/list")
-    public CommonResult<Page<MenuVo>> getMenuList(@ModelAttribute MenuQueryPage queryPage) {
+    public CommonResult<Page<MenuVO>> getMenuList(@ModelAttribute MenuQueryPage queryPage) {
         return CommonResult.success(menuService.getMenuList(queryPage));
     }
 
@@ -78,7 +78,7 @@ public class MenuController {
      */
     @ApiOperation("查询所有菜单列表")
     @GetMapping("/list/all")
-    public CommonResult<List<MenuVo>> getAllMenuList() {
+    public CommonResult<List<MenuVO>> getAllMenuList() {
         return CommonResult.success(menuService.getAllMenuList());
     }
 
@@ -89,7 +89,7 @@ public class MenuController {
      */
     @ApiOperation("查询所有菜单树")
     @GetMapping("/list/tree")
-    public CommonResult<List<MenuVo>> getMenuTreeList() {
+    public CommonResult<List<MenuVO>> getMenuTreeList() {
         return CommonResult.success(menuService.getMenuTreeList());
     }
 }

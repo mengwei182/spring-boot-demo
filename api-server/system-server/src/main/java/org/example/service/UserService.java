@@ -1,10 +1,10 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.UserQueryPage;
+import org.example.query.UserQueryPage;
 import org.example.cache.CacheService;
-import org.example.entity.system.vo.UserVo;
-import org.example.entity.system.vo.UsernamePasswordVo;
+import org.example.entity.system.vo.UserVO;
+import org.example.entity.system.vo.UsernamePasswordVO;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -16,10 +16,10 @@ public interface UserService extends CacheService {
     /**
      * 新增用户
      *
-     * @param userVo
+     * @param userVO
      * @return
      */
-    String addUser(UserVo userVo);
+    String addUser(UserVO userVO);
 
     /**
      * 分页查看用户列表
@@ -27,22 +27,22 @@ public interface UserService extends CacheService {
      * @param queryPage
      * @return
      */
-    Page<UserVo> getUserList(UserQueryPage queryPage);
+    Page<UserVO> getUserList(UserQueryPage queryPage);
 
     /**
      * 查看用户详情
      *
      * @return
      */
-    UserVo getUserInfo(String id);
+    UserVO getUserInfo(String id);
 
     /**
      * 更新用户信息
      *
-     * @param userVo
+     * @param userVO
      * @return
      */
-    Boolean updateUser(UserVo userVo);
+    Boolean updateUser(UserVO userVO);
 
     /**
      * 更新密码
@@ -50,7 +50,7 @@ public interface UserService extends CacheService {
      * @param usernamePasswordVo
      * @return
      */
-    Boolean updateUserPassword(UsernamePasswordVo usernamePasswordVo);
+    Boolean updateUserPassword(UsernamePasswordVO usernamePasswordVo);
 
     /**
      * 删除用户

@@ -2,7 +2,7 @@ package org.example.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.example.entity.system.vo.UsernamePasswordVo;
+import org.example.entity.system.vo.UsernamePasswordVO;
 import org.example.model.CommonResult;
 import org.example.service.BaseService;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +33,7 @@ public class BaseController {
      */
     @ApiOperation("登录")
     @PostMapping(value = "/login")
-    public CommonResult<String> login(HttpServletRequest request, @Valid @RequestBody UsernamePasswordVo usernamePasswordVo) {
+    public CommonResult<String> login(HttpServletRequest request, @Valid @RequestBody UsernamePasswordVO usernamePasswordVo) {
         return CommonResult.success(baseService.login(request, usernamePasswordVo));
     }
 

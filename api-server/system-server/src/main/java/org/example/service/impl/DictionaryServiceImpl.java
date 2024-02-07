@@ -4,10 +4,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.DictionaryQueryPage;
+import org.example.query.DictionaryQueryPage;
 import org.example.entity.base.BaseEntity;
 import org.example.entity.system.Dictionary;
-import org.example.entity.system.vo.DictionaryVo;
+import org.example.entity.system.vo.DictionaryVO;
 import org.example.mapper.DictionaryMapper;
 import org.example.result.CommonServerResult;
 import org.example.result.SystemServerResult;
@@ -37,7 +37,7 @@ public class DictionaryServiceImpl implements DictionaryService {
      * @return
      */
     @Override
-    public Boolean addDictionary(DictionaryVo dictionaryVo) {
+    public Boolean addDictionary(DictionaryVO dictionaryVo) {
         Dictionary dictionary = new Dictionary();
         BeanUtils.copyProperties(dictionaryVo, dictionary);
         dictionary.setId(CommonUtils.uuid());
@@ -97,7 +97,7 @@ public class DictionaryServiceImpl implements DictionaryService {
      * @return
      */
     @Override
-    public Boolean updateDictionary(DictionaryVo dictionaryVo) {
+    public Boolean updateDictionary(DictionaryVO dictionaryVo) {
         String parentId = BaseEntity.TOP_PARENT_ID;
         LambdaQueryWrapper<Dictionary> queryWrapper = new LambdaQueryWrapper<>();
         Dictionary resultDictionary = dictionaryMapper.selectOne(queryWrapper.eq(Dictionary::getParentId, parentId).eq(Dictionary::getName, dictionaryVo.getName()));
@@ -118,10 +118,10 @@ public class DictionaryServiceImpl implements DictionaryService {
      * @return
      */
     @Override
-    public Page<DictionaryVo> getDictionaryList(DictionaryQueryPage queryPage) {
+    public Page<DictionaryVO> getDictionaryList(DictionaryQueryPage queryPage) {
         Page<Dictionary> page = new Page<>(queryPage.getPageNumber(), queryPage.getPageSize());
         List<Dictionary> dictionaries = dictionaryMapper.getDictionaries(page, queryPage);
         page.setRecords(dictionaries);
-        return PageUtils.wrap(page, DictionaryVo.class);
+        return PageUtils.wrap(page, DictionaryVO.class);
     }
 }

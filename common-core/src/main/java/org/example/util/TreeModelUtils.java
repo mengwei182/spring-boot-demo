@@ -2,7 +2,7 @@ package org.example.util;
 
 import cn.hutool.core.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.example.entity.base.vo.TreeModel;
+import org.example.tree.TreeModel;
 import org.example.result.exception.SystemException;
 import org.example.tree.TreeModelField;
 import org.example.tree.TreeModelFieldEnum;

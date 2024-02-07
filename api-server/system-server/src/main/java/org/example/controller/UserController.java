@@ -3,9 +3,9 @@ package org.example.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.example.api.UserQueryPage;
-import org.example.entity.system.vo.UserVo;
-import org.example.entity.system.vo.UsernamePasswordVo;
+import org.example.query.UserQueryPage;
+import org.example.entity.system.vo.UserVO;
+import org.example.entity.system.vo.UsernamePasswordVO;
 import org.example.model.CommonResult;
 import org.example.service.UserService;
 import org.example.usercontext.UserContext;
@@ -29,13 +29,13 @@ public class UserController {
     /**
      * 新增用户
      *
-     * @param userVo
+     * @param userVO
      * @return
      */
     @ApiOperation("新增用户")
     @PostMapping("/add")
-    public CommonResult<String> register(@Valid @RequestBody UserVo userVo) {
-        return CommonResult.success(userService.addUser(userVo));
+    public CommonResult<String> register(@Valid @RequestBody UserVO userVO) {
+        return CommonResult.success(userService.addUser(userVO));
     }
 
     /**
@@ -46,7 +46,7 @@ public class UserController {
      */
     @ApiOperation("分页查看用户列表")
     @GetMapping("/list")
-    public CommonResult<Page<UserVo>> getUserList(@ModelAttribute UserQueryPage queryPage) {
+    public CommonResult<Page<UserVO>> getUserList(@ModelAttribute UserQueryPage queryPage) {
         return CommonResult.success(userService.getUserList(queryPage));
     }
 
@@ -57,20 +57,20 @@ public class UserController {
      */
     @ApiOperation("查看用户详情")
     @GetMapping("/info")
-    public CommonResult<UserVo> getUserInfo() {
+    public CommonResult<UserVO> getUserInfo() {
         return CommonResult.success(userService.getUserInfo(UserContext.get().getId()));
     }
 
     /**
      * 更新用户信息
      *
-     * @param userVo
+     * @param userVO
      * @return
      */
     @ApiOperation("更新用户信息")
     @PutMapping("/update")
-    public CommonResult<Boolean> updateUser(@RequestBody UserVo userVo) {
-        return CommonResult.success(userService.updateUser(userVo));
+    public CommonResult<Boolean> updateUser(@RequestBody UserVO userVO) {
+        return CommonResult.success(userService.updateUser(userVO));
     }
 
     /**
@@ -81,7 +81,7 @@ public class UserController {
      */
     @ApiOperation("更新密码")
     @PostMapping("/updatePassword")
-    public CommonResult<Boolean> updateUserPassword(@Valid @RequestBody UsernamePasswordVo usernamePasswordVo) {
+    public CommonResult<Boolean> updateUserPassword(@Valid @RequestBody UsernamePasswordVO usernamePasswordVo) {
         return CommonResult.success(userService.updateUserPassword(usernamePasswordVo));
     }
 

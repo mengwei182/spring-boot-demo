@@ -1,9 +1,9 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.RoleQueryPage;
-import org.example.entity.system.vo.RoleMenuRelationVo;
-import org.example.entity.system.vo.RoleVo;
+import org.example.query.RoleQueryPage;
+import org.example.entity.system.vo.RoleMenuRelationVO;
+import org.example.entity.system.vo.RoleVO;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public interface RoleService {
      * @param roleVo
      * @return
      */
-    Boolean addRole(RoleVo roleVo);
+    Boolean addRole(RoleVO roleVo);
 
     /**
      * 删除角色
@@ -34,7 +34,7 @@ public interface RoleService {
      * @param roleVo
      * @return
      */
-    Boolean updateRole(RoleVo roleVo);
+    Boolean updateRole(RoleVO roleVo);
 
     /**
      * 新增角色菜单关系
@@ -42,7 +42,7 @@ public interface RoleService {
      * @param roleMenuRelationVo
      * @return
      */
-    Boolean addRoleMenu(RoleMenuRelationVo roleMenuRelationVo);
+    Boolean addRoleMenu(RoleMenuRelationVO roleMenuRelationVo);
 
     /**
      * 查询角色列表
@@ -50,12 +50,12 @@ public interface RoleService {
      * @param queryPage
      * @return
      */
-    Page<RoleVo> getRoleList(RoleQueryPage queryPage);
+    Page<RoleVO> getRoleList(RoleQueryPage queryPage);
 
     /**
      * 查询所有角色列表
      *
      * @return
      */
-    List<RoleVo> getAllRoleList();
+    List<RoleVO> getAllRoleList();
 }

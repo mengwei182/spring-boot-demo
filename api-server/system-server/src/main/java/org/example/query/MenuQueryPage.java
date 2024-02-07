@@ -1,4 +1,4 @@
-package org.example.api;
+package org.example.query;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

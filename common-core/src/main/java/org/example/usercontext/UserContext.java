@@ -1,7 +1,7 @@
 package org.example.usercontext;
 
 import lombok.Data;
-import org.example.entity.system.vo.UserVo;
+import org.example.entity.system.vo.UserVO;
 
 import java.io.Serializable;
 
@@ -11,16 +11,16 @@ import java.io.Serializable;
  */
 @Data
 public final class UserContext implements Serializable {
-    private static final ThreadLocal<UserVo> USER_CONTEXTS = new ThreadLocal<>();
+    private static final ThreadLocal<UserVO> USER_CONTEXTS = new ThreadLocal<>();
 
     private UserContext() {
     }
 
-    public static UserVo get() {
+    public static UserVO get() {
         return USER_CONTEXTS.get();
     }
 
-    public static void set(UserVo data) {
+    public static void set(UserVO data) {
         USER_CONTEXTS.set(data);
     }
 

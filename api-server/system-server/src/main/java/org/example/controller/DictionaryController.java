@@ -3,8 +3,8 @@ package org.example.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.example.api.DictionaryQueryPage;
-import org.example.entity.system.vo.DictionaryVo;
+import org.example.query.DictionaryQueryPage;
+import org.example.entity.system.vo.DictionaryVO;
 import org.example.model.CommonResult;
 import org.example.service.DictionaryService;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,7 @@ public class DictionaryController {
      */
     @ApiOperation("新增字典")
     @PostMapping("/add")
-    public CommonResult<Boolean> addDictionary(@Valid @RequestBody DictionaryVo dictionaryVo) {
+    public CommonResult<Boolean> addDictionary(@Valid @RequestBody DictionaryVO dictionaryVo) {
         return CommonResult.success(dictionaryService.addDictionary(dictionaryVo));
     }
 
@@ -55,7 +55,7 @@ public class DictionaryController {
      */
     @ApiOperation("更新字典")
     @PutMapping("/update")
-    public CommonResult<Boolean> updateDictionary(@Valid @RequestBody DictionaryVo dictionaryVo) {
+    public CommonResult<Boolean> updateDictionary(@Valid @RequestBody DictionaryVO dictionaryVo) {
         return CommonResult.success(dictionaryService.updateDictionary(dictionaryVo));
     }
 
@@ -67,7 +67,7 @@ public class DictionaryController {
      */
     @ApiOperation("查询字典列表")
     @GetMapping("/list")
-    public CommonResult<Page<DictionaryVo>> getDictionaryList(@Valid @ModelAttribute DictionaryQueryPage queryPage) {
+    public CommonResult<Page<DictionaryVO>> getDictionaryList(@Valid @ModelAttribute DictionaryQueryPage queryPage) {
         return CommonResult.success(dictionaryService.getDictionaryList(queryPage));
     }
 }

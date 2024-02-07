@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.example.api.ResourceCategoryQueryPage;
+import org.example.query.ResourceCategoryQueryPage;
 import org.example.entity.system.ResourceCategory;
 
 import java.util.List;

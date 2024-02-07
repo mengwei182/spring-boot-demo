@@ -5,16 +5,18 @@ import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
 import org.example.entity.base.Token;
-import org.example.entity.system.vo.ResourceVo;
-import org.example.entity.system.vo.UserVo;
+import org.example.entity.system.vo.ResourceVO;
+import org.example.entity.system.vo.UserVO;
 import org.example.model.CommonResult;
-import org.example.properties.CommonProperties;
 import org.example.result.CommonServerResult;
 import org.example.result.SystemServerResult;
 import org.example.util.GsonUtils;
 import org.example.util.TokenUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 
@@ -24,6 +26,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,8 +41,8 @@ import java.util.Optional;
 @Component
 @Order(Integer.MIN_VALUE)
 public class BaseFilter implements Filter {
-    @Resource
-    private CommonProperties commonProperties;
+    @Value("${skip-urls}")
+    private String skipUrls;
     @Resource
     private CaffeineRedisCache caffeineRedisCache;
 
@@ -49,7 +52,7 @@ public class BaseFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
-        response.addHeader("Content-type", "application/json");
+        response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         // 简单请求直接放行
         if (HttpMethod.OPTIONS.toString().equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
@@ -67,16 +70,16 @@ public class BaseFilter implements Filter {
             response.getWriter().print(GsonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
         }
-        Token<UserVo> token = TokenUtils.unsigned(authorization, UserVo.class);
-        UserVo userVo = token.getData();
+        Token<UserVO> token = TokenUtils.unsigned(authorization, UserVO.class);
+        UserVO userVO = token.getData();
         // 校验token
-        if (!tokenFilter(authorization, userVo)) {
+        if (!tokenFilter(authorization, userVO)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().print(GsonUtils.gson().toJson(CommonResult.unauthorized()));
             return;
         }
         // 校验资源
-        if (!resourceFilter(userVo, request)) {
+        if (!resourceFilter(userVO, request)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().print(GsonUtils.gson().toJson(CommonResult.unauthorized()));
         }
@@ -87,8 +90,7 @@ public class BaseFilter implements Filter {
         String servletPath = request.getServletPath();
         AntPathMatcher antPathMatcher = new AntPathMatcher();
         // 校验是否是不需要验证token的url
-        Optional<String> first = commonProperties.getSkipUrl().stream().filter(o -> antPathMatcher.match(o, servletPath)).findFirst();
-        return first.isPresent();
+        return Arrays.stream(skipUrls.split(",")).anyMatch(o -> antPathMatcher.match(o, servletPath));
     }
 
     private String authorizationHeaderFilter(HttpServletRequest request) {
@@ -98,14 +100,14 @@ public class BaseFilter implements Filter {
         return !StrUtil.isEmpty(authorizationHeader) ? authorizationHeader : authorizationParameter;
     }
 
-    private boolean tokenFilter(String authorization, UserVo userVo) {
+    private boolean tokenFilter(String authorization, UserVO userVO) {
         // 校验请求中的token参数和数据
-        if (userVo == null) {
+        if (userVO == null) {
             return false;
         }
         try {
             // token过期
-            String token = caffeineRedisCache.get(SystemServerResult.USER_TOKEN_KEY + userVo.getId(), String.class);
+            String token = caffeineRedisCache.get(SystemServerResult.USER_TOKEN_KEY + userVO.getId(), String.class);
             return !StrUtil.isEmpty(token) && authorization.equals(token);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -113,14 +115,14 @@ public class BaseFilter implements Filter {
         }
     }
 
-    private boolean resourceFilter(UserVo userVo, HttpServletRequest request) {
+    private boolean resourceFilter(UserVO userVO, HttpServletRequest request) {
         String servletPath = request.getServletPath();
         AntPathMatcher antPathMatcher = new AntPathMatcher();
-        List<ResourceVo> resourceVos = userVo.getResources();
-        if (CollectionUtil.isEmpty(resourceVos)) {
+        List<ResourceVO> resourceVOS = userVO.getResources();
+        if (CollectionUtil.isEmpty(resourceVOS)) {
             return false;
         }
-        Optional<ResourceVo> findAny = resourceVos.stream().filter(o -> antPathMatcher.match(o.getUrl(), servletPath)).findAny();
+        Optional<ResourceVO> findAny = resourceVOS.stream().filter(o -> antPathMatcher.match(o.getUrl(), servletPath)).findAny();
         return findAny.isPresent();
     }
 }

@@ -5,13 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
-import org.example.api.ResourceQueryPage;
+import org.example.query.ResourceQueryPage;
 import org.example.entity.system.Resource;
 import org.example.entity.system.ResourceCategory;
 import org.example.entity.system.RoleResourceRelation;
 import org.example.entity.system.UserRoleRelation;
-import org.example.entity.system.vo.ResourceCategoryVo;
-import org.example.entity.system.vo.ResourceVo;
+import org.example.entity.system.vo.ResourceCategoryVO;
+import org.example.entity.system.vo.ResourceVO;
 import org.example.mapper.ResourceCategoryMapper;
 import org.example.mapper.ResourceMapper;
 import org.example.mapper.RoleResourceRelationMapper;
@@ -69,7 +69,7 @@ public class ResourceServiceImpl implements ResourceService {
      * @return
      */
     @Override
-    public Boolean addResource(ResourceVo resourceVo) {
+    public Boolean addResource(ResourceVO resourceVo) {
         ResourceCategory resourceCategory = resourceCategoryMapper.selectById(resourceVo.getCategoryId());
         if (resourceCategory == null) {
             throw new SystemException(SystemServerResult.CATEGORY_NOT_EXIST);
@@ -111,7 +111,7 @@ public class ResourceServiceImpl implements ResourceService {
      * @return
      */
     @Override
-    public Boolean updateResource(ResourceVo resourceVo) {
+    public Boolean updateResource(ResourceVO resourceVo) {
         Resource resource = resourceMapper.selectById(resourceVo.getId());
         if (resource == null) {
             throw new SystemException(SystemServerResult.RESOURCE_NOT_EXIST);
@@ -137,11 +137,11 @@ public class ResourceServiceImpl implements ResourceService {
      * @return
      */
     @Override
-    public Page<ResourceVo> getResourceList(ResourceQueryPage queryPage) {
+    public Page<ResourceVO> getResourceList(ResourceQueryPage queryPage) {
         Page<Resource> page = new Page<>();
         List<Resource> resourceList = resourceMapper.getResourceList(page, queryPage);
         page.setRecords(resourceList);
-        return PageUtils.wrap(page, ResourceVo.class);
+        return PageUtils.wrap(page, ResourceVO.class);
     }
 
     /**
@@ -150,9 +150,9 @@ public class ResourceServiceImpl implements ResourceService {
      * @return
      */
     @Override
-    public List<ResourceVo> getAllResourceList() {
+    public List<ResourceVO> getAllResourceList() {
         List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<>());
-        return CommonUtils.transformList(resources, ResourceVo.class);
+        return CommonUtils.transformList(resources, ResourceVO.class);
     }
 
     /**
@@ -161,9 +161,9 @@ public class ResourceServiceImpl implements ResourceService {
      * @return
      */
     @Override
-    public ResourceVo getResourceById(String id) {
+    public ResourceVO getResourceById(String id) {
         Resource resource = resourceMapper.selectById(id);
-        ResourceVo resourceVo = new ResourceVo();
+        ResourceVO resourceVo = new ResourceVO();
         BeanUtils.copyProperties(resource, resourceVo);
         return resourceVo;
     }
@@ -176,9 +176,9 @@ public class ResourceServiceImpl implements ResourceService {
      * @return
      */
     @Override
-    public ResourceVo getResource(String url, String categoryId) {
+    public ResourceVO getResource(String url, String categoryId) {
         Resource resource = resourceMapper.selectOne(new LambdaQueryWrapper<Resource>().eq(Resource::getUrl, url).eq(Resource::getCategoryId, categoryId));
-        return CommonUtils.transformObject(resource, ResourceVo.class);
+        return CommonUtils.transformObject(resource, ResourceVO.class);
     }
 
     /**
@@ -200,10 +200,10 @@ public class ResourceServiceImpl implements ResourceService {
             }
             String categoryName = applicationName + "_" + name;
             String categoryId = CommonUtils.uuid();
-            ResourceCategoryVo resourceCategoryVo = resourceCategoryService.getResourceCategoryByName(categoryName);
+            ResourceCategoryVO resourceCategoryVo = resourceCategoryService.getResourceCategoryByName(categoryName);
             // 资源分类不存在
             if (resourceCategoryVo == null) {
-                resourceCategoryVo = new ResourceCategoryVo();
+                resourceCategoryVo = new ResourceCategoryVO();
                 resourceCategoryVo.setId(categoryId);
                 resourceCategoryVo.setName(categoryName);
                 resourceCategoryVo = resourceCategoryService.addResourceCategory(resourceCategoryVo);
@@ -212,12 +212,12 @@ public class ResourceServiceImpl implements ResourceService {
             categoryId = resourceCategoryVo.getId();
             Set<PathPattern> patterns = pathPatternsCondition.getPatterns();
             for (PathPattern pattern : patterns) {
-                ResourceVo resourceVo = getResource(pattern.getPatternString(), categoryId);
+                ResourceVO resourceVo = getResource(pattern.getPatternString(), categoryId);
                 // 资源已存在，直接跳过
                 if (resourceVo != null) {
                     continue;
                 }
-                resourceVo = new ResourceVo();
+                resourceVo = new ResourceVO();
                 resourceVo.setName(handlerMethod.getMethod().getName());
                 resourceVo.setCategoryId(categoryId);
                 resourceVo.setUrl(pattern.getPatternString());
@@ -234,17 +234,17 @@ public class ResourceServiceImpl implements ResourceService {
      * @return
      */
     @Override
-    public List<ResourceVo> getResourceByUserId(String userId) {
+    public List<ResourceVO> getResourceByUserId(String userId) {
         String key = SystemServerResult.RESOURCE_KEY + userId;
-        List<ResourceVo> resourceVos = (List<ResourceVo>) caffeineRedisCache.get(key, List.class);
-        if (CollectionUtil.isEmpty(resourceVos)) {
+        List<ResourceVO> resourceVOS = (List<ResourceVO>) caffeineRedisCache.get(key, List.class);
+        if (CollectionUtil.isEmpty(resourceVOS)) {
             List<UserRoleRelation> userRoleRelations = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, userId));
             List<RoleResourceRelation> roleResourceRelations = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, userRoleRelations.stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList())));
             List<Resource> resources = resourceMapper.selectList(new LambdaQueryWrapper<Resource>().in(Resource::getId, roleResourceRelations.stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList())));
-            resourceVos = CommonUtils.transformList(resources, ResourceVo.class);
+            resourceVOS = CommonUtils.transformList(resources, ResourceVO.class);
         }
-        caffeineRedisCache.put(key, resourceVos, Duration.ofHours(1));
-        return resourceVos;
+        caffeineRedisCache.put(key, resourceVOS, Duration.ofHours(1));
+        return resourceVOS;
     }
 
     /**

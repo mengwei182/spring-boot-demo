@@ -3,8 +3,8 @@ package org.example.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.example.api.ResourceQueryPage;
-import org.example.entity.system.vo.ResourceVo;
+import org.example.query.ResourceQueryPage;
+import org.example.entity.system.vo.ResourceVO;
 import org.example.model.CommonResult;
 import org.example.service.ResourceService;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,7 @@ public class ResourceController {
      */
     @ApiOperation("新增资源")
     @PostMapping("/add")
-    public CommonResult<Boolean> addResource(@RequestBody ResourceVo resourceVo) {
+    public CommonResult<Boolean> addResource(@RequestBody ResourceVO resourceVo) {
         return CommonResult.success(resourceService.addResource(resourceVo));
     }
 
@@ -55,7 +55,7 @@ public class ResourceController {
      */
     @ApiOperation("更新资源")
     @PutMapping("/update")
-    public CommonResult<Boolean> updateResource(@RequestBody ResourceVo resourceVo) {
+    public CommonResult<Boolean> updateResource(@RequestBody ResourceVO resourceVo) {
         return CommonResult.success(resourceService.updateResource(resourceVo));
     }
 
@@ -67,7 +67,7 @@ public class ResourceController {
      */
     @ApiOperation("分页获取资源列表")
     @GetMapping("/list")
-    public CommonResult<Page<ResourceVo>> getResourceList(@ModelAttribute ResourceQueryPage queryPage) {
+    public CommonResult<Page<ResourceVO>> getResourceList(@ModelAttribute ResourceQueryPage queryPage) {
         return CommonResult.success(resourceService.getResourceList(queryPage));
     }
 
@@ -78,7 +78,7 @@ public class ResourceController {
      */
     @ApiOperation("获取全部资源列表")
     @GetMapping("/list/all")
-    public CommonResult<List<ResourceVo>> getAllResourceList() {
+    public CommonResult<List<ResourceVO>> getAllResourceList() {
         return CommonResult.success(resourceService.getAllResourceList());
     }
 
@@ -89,7 +89,7 @@ public class ResourceController {
      */
     @ApiOperation("根据id获取资源详情")
     @GetMapping("/{id}")
-    public CommonResult<ResourceVo> getResourceById(@PathVariable String id) {
+    public CommonResult<ResourceVO> getResourceById(@PathVariable String id) {
         return CommonResult.success(resourceService.getResourceById(id));
     }
 

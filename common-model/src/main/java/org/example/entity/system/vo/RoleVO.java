@@ -4,29 +4,27 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.base.BaseEntity;
 
-import java.util.List;
-
 /**
  * @author lihui
  * @since 2022/10/29
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RoleMenuRelationVo extends BaseEntity {
+public class RoleVO extends BaseEntity {
     /**
-     * 角色id
+     * 名称
      */
-    private String roleId;
+    private String name;
     /**
-     * 菜单id
+     * 排序
      */
-    private String menuId;
+    private Integer sort;
     /**
-     * 角色id集合
+     * 状态
      */
-    private List<String> roleIds;
+    private Integer status;
     /**
-     * 菜单id集合
+     * 描述
      */
-    private List<String> menuIds;
+    private String description;
 }

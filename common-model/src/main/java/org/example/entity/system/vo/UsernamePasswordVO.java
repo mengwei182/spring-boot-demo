@@ -7,7 +7,7 @@ import lombok.Data;
  * @since 2023/4/3
  */
 @Data
-public class UsernamePasswordVo {
+public class UsernamePasswordVO {
     private String id;
     /**
      * 用户名

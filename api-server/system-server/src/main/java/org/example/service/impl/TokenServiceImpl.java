@@ -2,7 +2,7 @@ package org.example.service.impl;
 
 import org.example.CaffeineRedisCache;
 import org.example.entity.base.Token;
-import org.example.entity.system.vo.UserVo;
+import org.example.entity.system.vo.UserVO;
 import org.example.result.SystemServerResult;
 import org.example.result.exception.SystemException;
 import org.example.service.TokenService;
@@ -33,8 +33,8 @@ public class TokenServiceImpl implements TokenService {
      */
     @Override
     public String refresh(String userId) {
-        UserVo userVo = userService.getUserInfo(userId);
-        if (userVo == null) {
+        UserVO userVO = userService.getUserInfo(userId);
+        if (userVO == null) {
             throw new SystemException(SystemServerResult.USER_NOT_EXIST);
         }
         long time = userService.getTokenExpireTime(userId);
@@ -44,7 +44,7 @@ public class TokenServiceImpl implements TokenService {
             clear(userId);
             throw new SystemException(SystemServerResult.TOKEN_EXPIRATION_TIME_INVALID);
         }
-        Token<UserVo> token = new Token<>(userId, new Date(), userVo);
+        Token<UserVO> token = new Token<>(userId, new Date(), userVO);
         // 重新设置token
         caffeineRedisCache.put(SystemServerResult.USER_TOKEN_KEY + userId, token, Duration.ofMillis(time));
         return TokenUtils.sign(token);

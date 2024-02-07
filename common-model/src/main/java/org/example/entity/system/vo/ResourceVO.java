@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ResourceVo extends BaseEntity {
+public class ResourceVO extends BaseEntity {
     /**
      * 资源名称
      */

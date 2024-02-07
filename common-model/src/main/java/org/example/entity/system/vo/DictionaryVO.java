@@ -12,7 +12,7 @@ import org.example.tree.TreeModelFieldEnum;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DictionaryVo extends BaseEntity {
+public class DictionaryVO extends BaseEntity {
     /**
      * 名称
      */

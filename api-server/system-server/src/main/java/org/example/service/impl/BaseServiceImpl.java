@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
 import org.example.entity.base.Token;
 import org.example.entity.system.User;
-import org.example.entity.system.vo.UserVo;
-import org.example.entity.system.vo.UsernamePasswordVo;
+import org.example.entity.system.vo.UserVO;
+import org.example.entity.system.vo.UsernamePasswordVO;
 import org.example.enums.UserVerifyStatusEnum;
 import org.example.mapper.UserMapper;
 import org.example.result.CommonServerResult;
@@ -62,7 +62,7 @@ public class BaseServiceImpl implements BaseService {
      * @return
      */
     @Override
-    public String login(HttpServletRequest request, UsernamePasswordVo usernamePasswordVo) {
+    public String login(HttpServletRequest request, UsernamePasswordVO usernamePasswordVo) {
         String username = usernamePasswordVo.getUsername();
         String password = usernamePasswordVo.getPassword();
         if (StrUtil.isEmpty(username)) {
@@ -150,13 +150,13 @@ public class BaseServiceImpl implements BaseService {
             userService.clear(user.getId());
             throw new SystemException(SystemServerResult.TOKEN_EXPIRATION_TIME_INVALID);
         }
-        UserVo userVo = CommonUtils.transformObject(user, UserVo.class);
+        UserVO userVO = CommonUtils.transformObject(user, UserVO.class);
         // 查询并设置登录用户的resource数据
-        userVo.setResources(resourceService.getResourceByUserId(user.getId()));
-        Token<UserVo> token = new Token<>(user.getId(), new Date(), userVo);
+        userVO.setResources(resourceService.getResourceByUserId(user.getId()));
+        Token<UserVO> token = new Token<>(user.getId(), new Date(), userVO);
         String tokenString = TokenUtils.sign(token);
         userService.clear(user.getId());
-        caffeineRedisCache.put(user.getId(), userVo, Duration.ofMillis(time));
+        caffeineRedisCache.put(user.getId(), userVO, Duration.ofMillis(time));
         caffeineRedisCache.put(SystemServerResult.USER_TOKEN_KEY + user.getId(), tokenString, Duration.ofMillis(time));
         return tokenString;
     }
@@ -168,14 +168,14 @@ public class BaseServiceImpl implements BaseService {
      */
     @Override
     public Boolean logout() {
-        UserVo userVo = UserContext.get();
-        if (userVo == null) {
+        UserVO userVO = UserContext.get();
+        if (userVO == null) {
             return true;
         }
-        userService.clear(userVo.getId());
-        tokenService.clear(userVo.getId());
-        resourceService.clear(userVo.getId());
-        clear(userVo.getId());
+        userService.clear(userVO.getId());
+        tokenService.clear(userVO.getId());
+        resourceService.clear(userVO.getId());
+        clear(userVO.getId());
         UserContext.remove();
         return true;
     }

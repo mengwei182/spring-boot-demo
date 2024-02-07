@@ -1,7 +1,7 @@
 package org.example.service;
 
 import org.example.cache.CacheService;
-import org.example.entity.system.vo.UsernamePasswordVo;
+import org.example.entity.system.vo.UsernamePasswordVO;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +19,7 @@ public interface BaseService extends CacheService {
      * @param usernamePasswordVo
      * @return
      */
-    String login(HttpServletRequest request, UsernamePasswordVo usernamePasswordVo);
+    String login(HttpServletRequest request, UsernamePasswordVO usernamePasswordVo);
 
     /**
      * 登出

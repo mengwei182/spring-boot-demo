@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ResourceCategoryVo extends BaseEntity {
+public class ResourceCategoryVO extends BaseEntity {
     /**
      * 分类名称
      */
@@ -28,5 +28,5 @@ public class ResourceCategoryVo extends BaseEntity {
     /**
      * 资源列表
      */
-    private List<ResourceVo> resources;
+    private List<ResourceVO> resources;
 }

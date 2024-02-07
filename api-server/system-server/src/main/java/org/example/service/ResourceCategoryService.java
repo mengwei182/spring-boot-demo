@@ -1,8 +1,8 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.ResourceCategoryQueryPage;
-import org.example.entity.system.vo.ResourceCategoryVo;
+import org.example.query.ResourceCategoryQueryPage;
+import org.example.entity.system.vo.ResourceCategoryVO;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface ResourceCategoryService {
      * @param resourceCategoryVo
      * @return
      */
-    ResourceCategoryVo addResourceCategory(ResourceCategoryVo resourceCategoryVo);
+    ResourceCategoryVO addResourceCategory(ResourceCategoryVO resourceCategoryVo);
 
     /**
      * 删除资源分类信息
@@ -33,7 +33,7 @@ public interface ResourceCategoryService {
      * @param resourceCategoryVo
      * @return
      */
-    Boolean updateResourceCategory(ResourceCategoryVo resourceCategoryVo);
+    Boolean updateResourceCategory(ResourceCategoryVO resourceCategoryVo);
 
     /**
      * 分页获取资源分类列表
@@ -41,14 +41,14 @@ public interface ResourceCategoryService {
      * @param queryPage
      * @return
      */
-    Page<ResourceCategoryVo> getResourceCategoryList(ResourceCategoryQueryPage queryPage);
+    Page<ResourceCategoryVO> getResourceCategoryList(ResourceCategoryQueryPage queryPage);
 
     /**
      * 获取全部资源分类列表
      *
      * @return
      */
-    List<ResourceCategoryVo> getAllResourceCategoryList();
+    List<ResourceCategoryVO> getAllResourceCategoryList();
 
     /**
      * 根据资源分类名称查询资源分类信息
@@ -56,5 +56,5 @@ public interface ResourceCategoryService {
      * @param name
      * @return
      */
-    ResourceCategoryVo getResourceCategoryByName(String name);
+    ResourceCategoryVO getResourceCategoryByName(String name);
 }

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.example.api.MenuQueryPage;
+import org.example.query.MenuQueryPage;
 import org.example.entity.system.Menu;
 
 import java.util.List;

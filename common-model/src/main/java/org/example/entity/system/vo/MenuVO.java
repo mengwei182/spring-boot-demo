@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class MenuVo extends BaseEntity {
+public class MenuVO extends BaseEntity {
     /**
      * 名称
      */
@@ -71,5 +71,5 @@ public class MenuVo extends BaseEntity {
      * 子集
      */
     @TreeModelField(TreeModelFieldEnum.CHILDREN)
-    private List<MenuVo> children;
+    private List<MenuVO> children;
 }

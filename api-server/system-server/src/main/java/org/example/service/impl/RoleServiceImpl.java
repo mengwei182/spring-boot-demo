@@ -4,12 +4,12 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.RoleQueryPage;
+import org.example.query.RoleQueryPage;
 import org.example.entity.system.Role;
 import org.example.entity.system.RoleMenuRelation;
 import org.example.entity.system.UserRoleRelation;
-import org.example.entity.system.vo.RoleMenuRelationVo;
-import org.example.entity.system.vo.RoleVo;
+import org.example.entity.system.vo.RoleMenuRelationVO;
+import org.example.entity.system.vo.RoleVO;
 import org.example.mapper.RoleMapper;
 import org.example.mapper.RoleMenuRelationMapper;
 import org.example.mapper.UserRoleRelationMapper;
@@ -46,7 +46,7 @@ public class RoleServiceImpl implements RoleService {
      * @return
      */
     @Override
-    public Boolean addRole(RoleVo roleVo) {
+    public Boolean addRole(RoleVO roleVo) {
         Role role = new Role();
         BeanUtils.copyProperties(roleVo, role);
         role.setId(CommonUtils.uuid());
@@ -89,7 +89,7 @@ public class RoleServiceImpl implements RoleService {
      * @return
      */
     @Override
-    public Boolean updateRole(RoleVo roleVo) {
+    public Boolean updateRole(RoleVO roleVo) {
         Role role = roleMapper.selectById(roleVo.getId());
         if (role == null) {
             throw new SystemException(CommonServerResult.OBJECT_NOT_EXIST);
@@ -108,7 +108,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     @Transactional
-    public Boolean addRoleMenu(RoleMenuRelationVo roleMenuRelationVo) {
+    public Boolean addRoleMenu(RoleMenuRelationVO roleMenuRelationVo) {
         Role role = roleMapper.selectById(roleMenuRelationVo.getRoleId());
         if (role == null) {
             throw new SystemException(CommonServerResult.OBJECT_NOT_EXIST);
@@ -136,11 +136,11 @@ public class RoleServiceImpl implements RoleService {
      * @return
      */
     @Override
-    public Page<RoleVo> getRoleList(RoleQueryPage queryPage) {
+    public Page<RoleVO> getRoleList(RoleQueryPage queryPage) {
         Page<Role> page = new Page<>(queryPage.getPageNumber(), queryPage.getPageSize());
         List<Role> roleList = roleMapper.getRoleList(page, queryPage);
         page.setRecords(roleList);
-        return PageUtils.wrap(page, RoleVo.class);
+        return PageUtils.wrap(page, RoleVO.class);
     }
 
     /**
@@ -149,8 +149,8 @@ public class RoleServiceImpl implements RoleService {
      * @return
      */
     @Override
-    public List<RoleVo> getAllRoleList() {
+    public List<RoleVO> getAllRoleList() {
         List<Role> menus = roleMapper.selectList(new LambdaQueryWrapper<>());
-        return CommonUtils.transformList(menus, RoleVo.class);
+        return CommonUtils.transformList(menus, RoleVO.class);
     }
 }

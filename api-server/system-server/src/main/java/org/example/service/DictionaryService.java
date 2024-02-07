@@ -1,8 +1,8 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.DictionaryQueryPage;
-import org.example.entity.system.vo.DictionaryVo;
+import org.example.query.DictionaryQueryPage;
+import org.example.entity.system.vo.DictionaryVO;
 
 /**
  * @author lihui
@@ -15,7 +15,7 @@ public interface DictionaryService {
      * @param dictionaryVo
      * @return
      */
-    Boolean addDictionary(DictionaryVo dictionaryVo);
+    Boolean addDictionary(DictionaryVO dictionaryVo);
 
     /**
      * 删除字典
@@ -31,7 +31,7 @@ public interface DictionaryService {
      * @param dictionaryVo
      * @return
      */
-    Boolean updateDictionary(DictionaryVo dictionaryVo);
+    Boolean updateDictionary(DictionaryVO dictionaryVo);
 
     /**
      * 查询字典列表
@@ -39,5 +39,5 @@ public interface DictionaryService {
      * @param queryPage
      * @return
      */
-    Page<DictionaryVo> getDictionaryList(DictionaryQueryPage queryPage);
+    Page<DictionaryVO> getDictionaryList(DictionaryQueryPage queryPage);
 }

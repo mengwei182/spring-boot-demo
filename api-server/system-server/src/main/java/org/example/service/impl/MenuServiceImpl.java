@@ -4,11 +4,11 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.MenuQueryPage;
+import org.example.query.MenuQueryPage;
 import org.example.entity.base.BaseEntity;
 import org.example.entity.system.Menu;
 import org.example.entity.system.RoleMenuRelation;
-import org.example.entity.system.vo.MenuVo;
+import org.example.entity.system.vo.MenuVO;
 import org.example.mapper.MenuMapper;
 import org.example.mapper.RoleMenuRelationMapper;
 import org.example.result.CommonServerResult;
@@ -43,7 +43,7 @@ public class MenuServiceImpl implements MenuService {
      * @return
      */
     @Override
-    public Boolean addMenu(MenuVo menuVo) {
+    public Boolean addMenu(MenuVO menuVo) {
         Menu menu = new Menu();
         BeanUtils.copyProperties(menuVo, menu);
         menu.setId(CommonUtils.uuid());
@@ -98,7 +98,7 @@ public class MenuServiceImpl implements MenuService {
      * @return
      */
     @Override
-    public Boolean updateMenu(MenuVo menuVo) {
+    public Boolean updateMenu(MenuVO menuVo) {
         Menu menu = menuMapper.selectById(menuVo.getId());
         if (menu == null) {
             throw new SystemException(CommonServerResult.OBJECT_NOT_EXIST);
@@ -135,11 +135,11 @@ public class MenuServiceImpl implements MenuService {
      * @return
      */
     @Override
-    public Page<MenuVo> getMenuList(MenuQueryPage queryPage) {
+    public Page<MenuVO> getMenuList(MenuQueryPage queryPage) {
         Page<Menu> page = new Page<>(queryPage.getPageNumber(), queryPage.getPageSize());
         List<Menu> menuList = menuMapper.getMenuList(page, queryPage);
         page.setRecords(menuList);
-        return PageUtils.wrap(page, MenuVo.class);
+        return PageUtils.wrap(page, MenuVO.class);
     }
 
     /**
@@ -148,9 +148,9 @@ public class MenuServiceImpl implements MenuService {
      * @return
      */
     @Override
-    public List<MenuVo> getAllMenuList() {
+    public List<MenuVO> getAllMenuList() {
         List<Menu> menus = menuMapper.selectList(new LambdaQueryWrapper<>());
-        return CommonUtils.transformList(menus, MenuVo.class);
+        return CommonUtils.transformList(menus, MenuVO.class);
     }
 
     /**
@@ -159,8 +159,8 @@ public class MenuServiceImpl implements MenuService {
      * @return
      */
     @Override
-    public List<MenuVo> getMenuTreeList() {
+    public List<MenuVO> getMenuTreeList() {
         List<Menu> menus = menuMapper.selectList(new LambdaQueryWrapper<>());
-        return TreeModelUtils.buildObjectTree(CommonUtils.transformList(menus, MenuVo.class));
+        return TreeModelUtils.buildObjectTree(CommonUtils.transformList(menus, MenuVO.class));
     }
 }

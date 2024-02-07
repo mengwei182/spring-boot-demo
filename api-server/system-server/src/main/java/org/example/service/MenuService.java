@@ -1,8 +1,8 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.MenuQueryPage;
-import org.example.entity.system.vo.MenuVo;
+import org.example.query.MenuQueryPage;
+import org.example.entity.system.vo.MenuVO;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public interface MenuService {
      * @param menuVo
      * @return
      */
-    Boolean addMenu(MenuVo menuVo);
+    Boolean addMenu(MenuVO menuVo);
 
     /**
      * 删除菜单
@@ -33,7 +33,7 @@ public interface MenuService {
      * @param menuVo
      * @return
      */
-    Boolean updateMenu(MenuVo menuVo);
+    Boolean updateMenu(MenuVO menuVo);
 
     /**
      * 查询菜单列表
@@ -41,19 +41,19 @@ public interface MenuService {
      * @param queryPage
      * @return
      */
-    Page<MenuVo> getMenuList(MenuQueryPage queryPage);
+    Page<MenuVO> getMenuList(MenuQueryPage queryPage);
 
     /**
      * 查询所有菜单列表
      *
      * @return
      */
-    List<MenuVo> getAllMenuList();
+    List<MenuVO> getAllMenuList();
 
     /**
      * 查询菜单树列表
      *
      * @return
      */
-    List<MenuVo> getMenuTreeList();
+    List<MenuVO> getMenuTreeList();
 }

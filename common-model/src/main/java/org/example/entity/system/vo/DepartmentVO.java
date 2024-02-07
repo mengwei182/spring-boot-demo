@@ -12,7 +12,7 @@ import org.example.entity.base.BaseEntity;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class DepartmentVo extends BaseEntity {
+public class DepartmentVO extends BaseEntity {
     /**
      * 名称
      */

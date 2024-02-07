@@ -3,8 +3,8 @@ package org.example.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.example.api.ResourceCategoryQueryPage;
-import org.example.entity.system.vo.ResourceCategoryVo;
+import org.example.query.ResourceCategoryQueryPage;
+import org.example.entity.system.vo.ResourceCategoryVO;
 import org.example.model.CommonResult;
 import org.example.service.ResourceCategoryService;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +31,7 @@ public class ResourceCategoryController {
      */
     @ApiOperation("新增资源分类")
     @PostMapping("/add")
-    public CommonResult<ResourceCategoryVo> addResourceCategory(@RequestBody ResourceCategoryVo resourceCategoryVo) {
+    public CommonResult<ResourceCategoryVO> addResourceCategory(@RequestBody ResourceCategoryVO resourceCategoryVo) {
         return CommonResult.success(resourceCategoryService.addResourceCategory(resourceCategoryVo));
     }
 
@@ -55,7 +55,7 @@ public class ResourceCategoryController {
      */
     @ApiOperation("更新资源分类")
     @PutMapping("/update")
-    public CommonResult<Boolean> updateResourceCategory(@RequestBody ResourceCategoryVo resourceCategoryVo) {
+    public CommonResult<Boolean> updateResourceCategory(@RequestBody ResourceCategoryVO resourceCategoryVo) {
         return CommonResult.success(resourceCategoryService.updateResourceCategory(resourceCategoryVo));
     }
 
@@ -67,7 +67,7 @@ public class ResourceCategoryController {
      */
     @ApiOperation("获取资源分类列表")
     @GetMapping("/list")
-    public CommonResult<Page<ResourceCategoryVo>> getResourceCategoryList(@RequestBody ResourceCategoryQueryPage queryPage) {
+    public CommonResult<Page<ResourceCategoryVO>> getResourceCategoryList(@RequestBody ResourceCategoryQueryPage queryPage) {
         return CommonResult.success(resourceCategoryService.getResourceCategoryList(queryPage));
     }
 
@@ -78,7 +78,7 @@ public class ResourceCategoryController {
      */
     @ApiOperation("获取全部资源分类列表")
     @GetMapping("/list/all")
-    public CommonResult<List<ResourceCategoryVo>> getAllResourceCategoryList() {
+    public CommonResult<List<ResourceCategoryVO>> getAllResourceCategoryList() {
         return CommonResult.success(resourceCategoryService.getAllResourceCategoryList());
     }
 }

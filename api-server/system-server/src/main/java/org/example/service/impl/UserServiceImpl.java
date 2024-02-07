@@ -8,10 +8,10 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
-import org.example.api.UserQueryPage;
 import org.example.entity.system.*;
 import org.example.entity.system.vo.*;
 import org.example.mapper.*;
+import org.example.query.UserQueryPage;
 import org.example.result.SystemServerResult;
 import org.example.result.exception.SystemException;
 import org.example.service.UserService;
@@ -61,18 +61,20 @@ public class UserServiceImpl implements UserService {
     private UserRoleRelationMapper userRoleRelationMapper;
     @Resource
     private RoleResourceRelationMapper roleResourceRelationMapper;
+    @Resource
+    private UserDepartmentRelationMapper userDepartmentRelationMapper;
 
     /**
      * 新增用户
      *
-     * @param userVo
+     * @param userVO
      * @return
      */
     @Override
     @Transactional
-    public String addUser(UserVo userVo) {
-        String username = userVo.getUsername();
-        String password = userVo.getPassword();
+    public String addUser(UserVO userVO) {
+        String username = userVO.getUsername();
+        String password = userVO.getPassword();
         if (StrUtil.isEmpty(username)) {
             throw new SystemException(SystemServerResult.USERNAME_NULL);
         }
@@ -86,11 +88,11 @@ public class UserServiceImpl implements UserService {
             throw new SystemException(SystemServerResult.USER_EXIST);
         }
         user = new User();
-        BeanUtils.copyProperties(userVo, user);
+        BeanUtils.copyProperties(userVO, user);
         String id = CommonUtils.uuid();
         user.setId(id);
         user.setPassword(passwordEncoder.encode(password));
-        String tokenExpireTime = userVo.getTokenExpireTime();
+        String tokenExpireTime = userVO.getTokenExpireTime();
         if (StrUtil.isEmpty(tokenExpireTime)) {
             // 默认7天有效期
             user.setTokenExpireTime(Date.from(LocalDateTime.now().plusDays(7).atZone(ZoneId.systemDefault()).toInstant()));
@@ -101,7 +103,7 @@ public class UserServiceImpl implements UserService {
         user.setUpdater(UserContext.get().getId());
         userMapper.insert(user);
         // 添加角色信息
-        List<String> roleIds = userVo.getRoleIds();
+        List<String> roleIds = userVO.getRoleIds();
         if (CollectionUtil.isEmpty(roleIds)) {
             throw new SystemException(SystemServerResult.ROLE_NULL);
         }
@@ -125,12 +127,12 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public UserVo getUserInfo(String id) {
+    public UserVO getUserInfo(String id) {
         if (StrUtil.isEmpty(id)) {
             throw new SystemException(SystemServerResult.USER_NOT_EXIST);
         }
-        UserVo userVo = caffeineRedisCache.get(id, UserVo.class);
-        if (userVo == null) {
+        UserVO userVO = caffeineRedisCache.get(id, UserVO.class);
+        if (userVO == null) {
             User user = userMapper.selectById(id);
             if (user == null) {
                 return null;
@@ -143,26 +145,39 @@ public class UserServiceImpl implements UserService {
                 caffeineRedisCache.evict(SystemServerResult.USER_TOKEN_KEY + user.getId());
                 throw new SystemException(SystemServerResult.TOKEN_EXPIRATION_TIME_INVALID);
             }
-            userVo = CommonUtils.transformObject(user, UserVo.class);
-            userVo.setPassword(null);
-            // 查询并填充用户角色信息
-            List<String> roleIds = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, user.getId())).stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList());
-            List<Role> roles = roleMapper.selectBatchIds(roleIds);
-            userVo.setRoles(CommonUtils.transformList(roles, RoleVo.class));
-            // 查询并填充用户菜单信息
-            List<String> menuIds = roleMenuRelationMapper.selectList(new LambdaQueryWrapper<RoleMenuRelation>().in(RoleMenuRelation::getRoleId, roleIds)).stream().map(RoleMenuRelation::getMenuId).collect(Collectors.toList());
-            List<Menu> menus = menuMapper.selectBatchIds(menuIds);
-            userVo.setMenus(TreeModelUtils.buildObjectTree(CommonUtils.transformList(menus, MenuVo.class)));
-            // 查询并填充用户资源信息
-            List<String> resourceIds = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, roleIds)).stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList());
-            List<org.example.entity.system.Resource> resources = resourceMapper.selectBatchIds(resourceIds);
-            userVo.setResources(CommonUtils.transformList(resources, ResourceVo.class));
-            // 查询并填充用户部门信息
-            Department department = departmentMapper.selectById(user.getDepartmentId());
-            userVo.setDepartment(CommonUtils.transformObject(department, DepartmentVo.class));
-            caffeineRedisCache.put(id, userVo, Duration.ofMillis(time));
+            userVO = CommonUtils.transformObject(user, UserVO.class);
+            userVO.setPassword(null);
+            loadUserInfo(userVO);
+            caffeineRedisCache.put(id, userVO, Duration.ofMillis(time));
         }
-        return userVo;
+        return userVO;
+    }
+
+    private void loadUserInfo(UserVO userVO) {
+        // 查询并填充用户角色信息
+        List<String> roleIds = userRoleRelationMapper.selectList(new LambdaQueryWrapper<UserRoleRelation>().eq(UserRoleRelation::getUserId, userVO.getId())).stream().map(UserRoleRelation::getRoleId).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(roleIds)) {
+            List<Role> roles = roleMapper.selectBatchIds(roleIds);
+            userVO.setRoles(CommonUtils.transformList(roles, RoleVO.class));
+        }
+        // 查询并填充用户菜单信息
+        List<String> menuIds = roleMenuRelationMapper.selectList(new LambdaQueryWrapper<RoleMenuRelation>().in(RoleMenuRelation::getRoleId, roleIds)).stream().map(RoleMenuRelation::getMenuId).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(menuIds)) {
+            List<Menu> menus = menuMapper.selectBatchIds(menuIds);
+            userVO.setMenus(TreeModelUtils.buildObjectTree(CommonUtils.transformList(menus, MenuVO.class)));
+        }
+        // 查询并填充用户资源信息
+        List<String> resourceIds = roleResourceRelationMapper.selectList(new LambdaQueryWrapper<RoleResourceRelation>().in(RoleResourceRelation::getRoleId, roleIds)).stream().map(RoleResourceRelation::getResourceId).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(resourceIds)) {
+            List<org.example.entity.system.Resource> resources = resourceMapper.selectBatchIds(resourceIds);
+            userVO.setResources(CommonUtils.transformList(resources, ResourceVO.class));
+        }
+        // 查询并填充用户部门信息
+        List<String> departmentIds = userDepartmentRelationMapper.selectList(new LambdaQueryWrapper<UserDepartmentRelation>().in(UserDepartmentRelation::getUserId, userVO.getId())).stream().map(UserDepartmentRelation::getDepartmentId).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(departmentIds)) {
+            List<Department> departments = departmentMapper.selectBatchIds(departmentIds);
+            userVO.setDepartments(TreeModelUtils.buildObjectTree(CommonUtils.transformList(departments, DepartmentVO.class)));
+        }
     }
 
     /**
@@ -172,26 +187,26 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public Page<UserVo> getUserList(UserQueryPage queryPage) {
+    public Page<UserVO> getUserList(UserQueryPage queryPage) {
         Page<User> page = new Page<>(queryPage.getPageNumber(), queryPage.getPageSize());
         List<User> userList = userMapper.getUserList(page, queryPage);
         page.setRecords(userList);
-        return PageUtils.wrap(page, UserVo.class);
+        return PageUtils.wrap(page, UserVO.class);
     }
 
     /**
      * 更新用户信息
      *
-     * @param userVo
+     * @param userVO
      * @return
      */
     @Override
-    public Boolean updateUser(UserVo userVo) {
-        User user = userMapper.selectById(userVo.getId());
+    public Boolean updateUser(UserVO userVO) {
+        User user = userMapper.selectById(userVO.getId());
         if (user == null) {
             throw new SystemException(SystemServerResult.USER_NOT_EXIST);
         }
-        BeanUtils.copyProperties(userVo, user);
+        BeanUtils.copyProperties(userVO, user);
         userMapper.updateById(user);
         return true;
     }
@@ -203,7 +218,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public Boolean updateUserPassword(UsernamePasswordVo usernamePasswordVo) {
+    public Boolean updateUserPassword(UsernamePasswordVO usernamePasswordVo) {
         User user = userMapper.selectById(usernamePasswordVo.getId());
         if (user == null) {
             throw new SystemException(SystemServerResult.USER_NOT_EXIST);
@@ -244,8 +259,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public long getTokenExpireTime(String id) {
         User user = null;
-        UserVo userVo = caffeineRedisCache.get(id, UserVo.class);
-        if (userVo == null) {
+        UserVO userVO = caffeineRedisCache.get(id, UserVO.class);
+        if (userVO == null) {
             user = userMapper.selectById(id);
         }
         if (user == null) {

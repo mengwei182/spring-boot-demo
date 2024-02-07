@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UserVo extends BaseEntity {
+public class UserVO extends BaseEntity {
     /**
      * 用户名
      */
@@ -56,29 +56,29 @@ public class UserVo extends BaseEntity {
      */
     private Integer status;
     /**
-     * 部门ID
-     */
-    private String departmentId;
-    /**
      * 角色ID集合
      */
     private List<String> roleIds;
     /**
+     * 部门ID集合
+     */
+    private List<String> departmentIds;
+    /**
      * 菜单信息
      */
-    private List<MenuVo> menus;
+    private List<MenuVO> menus;
     /**
      * 角色信息
      */
-    private List<RoleVo> roles;
+    private List<RoleVO> roles;
     /**
      * 资源信息
      */
-    private List<ResourceVo> resources;
+    private List<ResourceVO> resources;
     /**
      * 部门信息
      */
-    private DepartmentVo department;
+    private List<DepartmentVO> departments;
     /**
      * 其他验证状态
      * 0.关闭

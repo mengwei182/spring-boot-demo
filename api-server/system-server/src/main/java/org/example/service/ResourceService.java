@@ -1,9 +1,9 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.api.ResourceQueryPage;
+import org.example.query.ResourceQueryPage;
 import org.example.cache.CacheService;
-import org.example.entity.system.vo.ResourceVo;
+import org.example.entity.system.vo.ResourceVO;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public interface ResourceService extends CacheService {
      * @param resourceVo
      * @return
      */
-    Boolean addResource(ResourceVo resourceVo);
+    Boolean addResource(ResourceVO resourceVo);
 
     /**
      * 删除资源
@@ -35,7 +35,7 @@ public interface ResourceService extends CacheService {
      * @param resourceVo
      * @return
      */
-    Boolean updateResource(ResourceVo resourceVo);
+    Boolean updateResource(ResourceVO resourceVo);
 
     /**
      * 分页获取资源列表
@@ -43,21 +43,21 @@ public interface ResourceService extends CacheService {
      * @param queryPage
      * @return
      */
-    Page<ResourceVo> getResourceList(ResourceQueryPage queryPage);
+    Page<ResourceVO> getResourceList(ResourceQueryPage queryPage);
 
     /**
      * 获取全部资源列表
      *
      * @return
      */
-    List<ResourceVo> getAllResourceList();
+    List<ResourceVO> getAllResourceList();
 
     /**
      * 根据id获取资源详情
      *
      * @return
      */
-    ResourceVo getResourceById(String id);
+    ResourceVO getResourceById(String id);
 
     /**
      * 根据url和分类id查询资源信息
@@ -66,7 +66,7 @@ public interface ResourceService extends CacheService {
      * @param categoryId
      * @return
      */
-    ResourceVo getResource(String url, String categoryId);
+    ResourceVO getResource(String url, String categoryId);
 
     /**
      * 刷新所有系统中所有资源
@@ -80,5 +80,5 @@ public interface ResourceService extends CacheService {
      * @param userId
      * @return
      */
-    List<ResourceVo> getResourceByUserId(String userId);
+    List<ResourceVO> getResourceByUserId(String userId);
 }

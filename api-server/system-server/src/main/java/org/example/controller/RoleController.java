@@ -3,9 +3,9 @@ package org.example.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.example.api.RoleQueryPage;
-import org.example.entity.system.vo.RoleMenuRelationVo;
-import org.example.entity.system.vo.RoleVo;
+import org.example.query.RoleQueryPage;
+import org.example.entity.system.vo.RoleMenuRelationVO;
+import org.example.entity.system.vo.RoleVO;
 import org.example.model.CommonResult;
 import org.example.service.RoleService;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +32,7 @@ public class RoleController {
      */
     @ApiOperation("新增角色")
     @PostMapping("/add")
-    public CommonResult<Boolean> addRole(@RequestBody RoleVo roleVo) {
+    public CommonResult<Boolean> addRole(@RequestBody RoleVO roleVo) {
         return CommonResult.success(roleService.addRole(roleVo));
     }
 
@@ -56,7 +56,7 @@ public class RoleController {
      */
     @ApiOperation("更新角色")
     @PutMapping("/update")
-    public CommonResult<Boolean> updateRole(@RequestBody RoleVo roleVo) {
+    public CommonResult<Boolean> updateRole(@RequestBody RoleVO roleVo) {
         return CommonResult.success(roleService.updateRole(roleVo));
     }
 
@@ -68,7 +68,7 @@ public class RoleController {
      */
     @ApiOperation("新增角色菜单关系")
     @PostMapping("/menu/update")
-    public CommonResult<Boolean> addRoleMenu(@RequestBody RoleMenuRelationVo roleMenuRelationVo) {
+    public CommonResult<Boolean> addRoleMenu(@RequestBody RoleMenuRelationVO roleMenuRelationVo) {
         return CommonResult.success(roleService.addRoleMenu(roleMenuRelationVo));
     }
 
@@ -80,7 +80,7 @@ public class RoleController {
      */
     @ApiOperation("查询角色列表")
     @GetMapping("/list")
-    public CommonResult<Page<RoleVo>> getRoleList(@ModelAttribute RoleQueryPage queryPage) {
+    public CommonResult<Page<RoleVO>> getRoleList(@ModelAttribute RoleQueryPage queryPage) {
         return CommonResult.success(roleService.getRoleList(queryPage));
     }
 
@@ -91,7 +91,7 @@ public class RoleController {
      */
     @ApiOperation("查询所有角色列表")
     @GetMapping("/list/all")
-    public CommonResult<List<RoleVo>> getAllRoleList() {
+    public CommonResult<List<RoleVO>> getAllRoleList() {
         return CommonResult.success(roleService.getAllRoleList());
     }
 }

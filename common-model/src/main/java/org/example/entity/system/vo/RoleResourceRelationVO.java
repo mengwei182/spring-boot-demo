@@ -4,29 +4,21 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.example.entity.base.BaseEntity;
 
-import java.util.List;
-
 /**
+ * 角色资源关联表
+ *
  * @author lihui
  * @since 2022/10/29
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UserRoleRelationVo extends BaseEntity {
-    /**
-     * 用户id
-     */
-    private String userId;
+public class RoleResourceRelationVO extends BaseEntity {
     /**
      * 角色id
      */
     private String roleId;
     /**
-     * 用户id集合
+     * 资源id
      */
-    private List<String> userIds;
-    /**
-     * 角色id集合
-     */
-    private List<String> roleIds;
+    private String resourceId;
 }

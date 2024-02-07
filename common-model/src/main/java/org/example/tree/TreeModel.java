@@ -1,4 +1,4 @@
-package org.example.entity.base.vo;
+package org.example.tree;
 
 import lombok.Data;
 
