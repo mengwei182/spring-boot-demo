@@ -1,8 +1,8 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.query.DictionaryQueryPage;
 import org.example.entity.system.vo.DictionaryVO;
+import org.example.query.DictionaryQueryPage;
 
 /**
  * @author lihui

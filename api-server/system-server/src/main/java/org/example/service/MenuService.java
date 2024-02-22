@@ -1,8 +1,8 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.query.MenuQueryPage;
 import org.example.entity.system.vo.MenuVO;
+import org.example.query.MenuQueryPage;
 
 import java.util.List;
 

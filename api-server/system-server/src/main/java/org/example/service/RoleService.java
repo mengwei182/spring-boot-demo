@@ -1,9 +1,9 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.query.RoleQueryPage;
 import org.example.entity.system.vo.RoleMenuRelationVO;
 import org.example.entity.system.vo.RoleVO;
+import org.example.query.RoleQueryPage;
 
 import java.util.List;
 

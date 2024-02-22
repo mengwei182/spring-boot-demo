@@ -1,8 +1,8 @@
 package org.example.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.query.ResourceCategoryQueryPage;
 import org.example.entity.system.vo.ResourceCategoryVO;
+import org.example.query.ResourceCategoryQueryPage;
 
 import java.util.List;
 
