@@ -17,6 +17,11 @@ spring:
         max-idle: 8
         max-active: 8
         max-wait: 180000
+  ldap:
+    urls: ldap://172.21.137.17:389
+    base: dc=example,dc=org
+    username: cn=Manager,dc=example,dc=org
+    password: mengwei131575585
   kafka:
     bootstrap-servers: 172.21.137.17:9092
     producer:

@@ -28,8 +28,8 @@
     <modules>
         <module>boot-launch</module>
         <module>common-model</module>
-        <module>common-core</module>
-        <module>api-server</module>
+        <module>core-model</module>
+        <module>server-model</module>
     </modules>
 
     <dependencyManagement>
@@ -75,39 +75,6 @@
                 <version>${spring.kafka.version}</version>
             </dependency>
             <!--kafka end-->
-
-            <!--module start-->
-            <dependency>
-                <groupId>org.example</groupId>
-                <artifactId>gateway-server</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.example</groupId>
-                <artifactId>common-model</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.example</groupId>
-                <artifactId>dubbo-server</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.example</groupId>
-                <artifactId>api-server</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.example</groupId>
-                <artifactId>common-core</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.example</groupId>
-                <artifactId>system-server</artifactId>
-                <version>1.0</version>
-            </dependency>
-            <!--module end-->
 
             <!--caffeine redis start-->
             <dependency>
