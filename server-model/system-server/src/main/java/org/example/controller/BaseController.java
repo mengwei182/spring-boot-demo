@@ -2,7 +2,7 @@ package org.example.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.example.model.CommonResult;
+import org.example.result.CommonResult;
 import org.example.service.BaseService;
 import org.example.system.entity.UserLoginVO;
 import org.springframework.web.bind.annotation.GetMapping;

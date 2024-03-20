@@ -1,8 +1,7 @@
-package org.example.model;
+package org.example.result;
 
 import lombok.Data;
-import org.example.global.ResultCode;
-import org.example.result.CommonServerResult;
+import org.example.global.HttpStatus;
 
 import java.io.Serializable;
 
@@ -26,38 +25,38 @@ public class CommonResult<T> implements Serializable {
     }
 
     public static <T> CommonResult<T> success() {
-        return new CommonResult<>(ResultCode.SUCCESS.getCode(), CommonServerResult.SUCCESS, null);
+        return new CommonResult<>(HttpStatus.OK.value(), CommonServerResult.SUCCESS, null);
     }
 
     public static <T> CommonResult<T> success(T data) {
-        return new CommonResult<>(ResultCode.SUCCESS.getCode(), CommonServerResult.SUCCESS, data);
+        return new CommonResult<>(HttpStatus.OK.value(), CommonServerResult.SUCCESS, data);
     }
 
     public static <T> CommonResult<T> success(String message, T data) {
-        return new CommonResult<>(ResultCode.SUCCESS.getCode(), message, data);
+        return new CommonResult<>(HttpStatus.OK.value(), message, data);
     }
 
     public static <T> CommonResult<T> error() {
-        return new CommonResult<>(ResultCode.ERROR.getCode(), CommonServerResult.ERROR, null);
+        return new CommonResult<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), CommonServerResult.ERROR, null);
     }
 
     public static <T> CommonResult<T> error(T data) {
-        return new CommonResult<>(ResultCode.ERROR.getCode(), CommonServerResult.ERROR, data);
+        return new CommonResult<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), CommonServerResult.ERROR, data);
     }
 
     public static <T> CommonResult<T> error(String message) {
-        return new CommonResult<>(ResultCode.ERROR.getCode(), message, null);
+        return new CommonResult<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), message, null);
     }
 
     public static <T> CommonResult<T> error(String message, T data) {
-        return new CommonResult<>(ResultCode.ERROR.getCode(), message, data);
+        return new CommonResult<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), message, data);
     }
 
     public static <T> CommonResult<T> unauthorized() {
-        return new CommonResult<>(ResultCode.UNAUTHORIZED.getCode(), CommonServerResult.UNAUTHORIZED, null);
+        return new CommonResult<>(HttpStatus.UNAUTHORIZED.value(), CommonServerResult.UNAUTHORIZED, null);
     }
 
     public static <T> CommonResult<T> forbidden() {
-        return new CommonResult<>(ResultCode.FORBIDDEN.getCode(), CommonServerResult.FORBIDDEN, null);
+        return new CommonResult<>(HttpStatus.FORBIDDEN.value(), CommonServerResult.FORBIDDEN, null);
     }
 }

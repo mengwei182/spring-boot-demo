@@ -3,7 +3,7 @@ package org.example.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.example.model.CommonResult;
+import org.example.result.CommonResult;
 import org.example.service.ResourceService;
 import org.example.system.entity.vo.ResourceVO;
 import org.example.system.query.ResourceQueryPage;

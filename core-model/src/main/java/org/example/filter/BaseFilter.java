@@ -5,7 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
 import org.example.entity.Token;
-import org.example.model.CommonResult;
+import org.example.result.CommonResult;
 import org.example.result.CommonServerResult;
 import org.example.result.SystemServerResult;
 import org.example.system.entity.vo.ResourceVO;
