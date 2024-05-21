@@ -12,10 +12,16 @@
 
     <groupId>org.example</groupId>
     <artifactId>spring-boot-demo</artifactId>
-    <version>1.0</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <properties>
+        <revision>1.0</revision>
+        <java.version>8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <jedis.version>5.1.0</jedis.version>
         <mysql.version>8.3.0</mysql.version>
@@ -27,13 +33,75 @@
 
     <modules>
         <module>boot-launch</module>
-        <module>common-model</module>
-        <module>core-model</module>
-        <module>server-model</module>
+        <module>common-modules</module>
+        <module>server-modules</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+            <!--module start-->
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>common-modules</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>common-modules-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>common-modules-kafka</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>common-modules-mybatisplus</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>common-modules-redis</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>common-modules-rocketmq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>common-modules-swagger</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>authentication-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>authentication-domain</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>system-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>system-domain</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.example</groupId>
+                <artifactId>system-server</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <!--module end-->
+
             <!--redis start-->
             <dependency>
                 <groupId>redis.clients</groupId>
@@ -80,7 +148,7 @@
             <dependency>
                 <groupId>org.example</groupId>
                 <artifactId>caffeine-redis-boot-starter</artifactId>
-                <version>1.0</version>
+                <version>${revision}</version>
             </dependency>
             <!--caffeine redis end-->
         </dependencies>
@@ -102,8 +170,9 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
+            <groupId>com.alibaba.fastjson2</groupId>
+            <artifactId>fastjson2</artifactId>
+            <version>2.0.50</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
