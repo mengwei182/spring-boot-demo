@@ -42,7 +42,7 @@ import java.util.List;
 @WebFilter
 @Component
 @Order(Integer.MIN_VALUE)
-public class BaseFilter implements Filter {
+public class AuthenticationFilter implements Filter {
     @Value("${skip-urls}")
     private String skipUrls;
     @Resource
@@ -68,22 +68,19 @@ public class BaseFilter implements Filter {
         // 校验请求中的token参数和数据
         String authorization = authorizationHeaderFilter(request);
         if (StrUtil.isEmpty(authorization)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().print(JSON.toJSONString(CommonResult.unauthorized()));
+            printUnauthorized(response);
             return;
         }
         Token<LoginUser> token = TokenUtils.unsigned(authorization, LoginUser.class);
         LoginUser loginUser = token.getData();
-        // 校验token
-        if (!tokenFilter(authorization, loginUser.getId())) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().print(JSON.toJSONString(CommonResult.unauthorized()));
+        // token是否有效
+        if (!tokenValid(authorization, loginUser.getId())) {
+            printUnauthorized(response);
             return;
         }
-        // 校验资源
-        if (!resourceFilter(request.getServletPath(), loginUser.getResourceUrls())) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().print(JSON.toJSONString(CommonResult.unauthorized()));
+        // resource是否有效
+        if (!resourceValid(request.getServletPath(), loginUser.getResourceUrls())) {
+            printUnauthorized(response);
         }
         filterChain.doFilter(request, response);
     }
@@ -102,7 +99,7 @@ public class BaseFilter implements Filter {
         return !StrUtil.isEmpty(authorizationHeader) ? authorizationHeader : authorizationParameter;
     }
 
-    private boolean tokenFilter(String authorization, String userId) {
+    private boolean tokenValid(String authorization, String userId) {
         // 校验请求中的token参数和数据
         if (StrUtil.isEmpty(userId)) {
             return false;
@@ -115,7 +112,7 @@ public class BaseFilter implements Filter {
             Token<?> token = TokenUtils.unsigned(authorization);
             Date currentDate = new Date();
             Date expirationDate = token.getExpirationDate();
-            boolean tokenExpiration = expirationDate.getTime() <= currentDate.getTime();
+            boolean tokenExpiration = expirationDate.getTime() > currentDate.getTime();
             return tokenValid && tokenExpiration;
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -123,8 +120,13 @@ public class BaseFilter implements Filter {
         }
     }
 
-    private boolean resourceFilter(String servletPath, List<String> resourceUrls) {
+    private boolean resourceValid(String servletPath, List<String> resourceUrls) {
         AntPathMatcher antPathMatcher = new AntPathMatcher();
         return resourceUrls.stream().anyMatch(o -> antPathMatcher.match(o, servletPath));
+    }
+
+    private void printUnauthorized(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.getWriter().print(JSON.toJSONString(CommonResult.unauthorized()));
     }
 }
