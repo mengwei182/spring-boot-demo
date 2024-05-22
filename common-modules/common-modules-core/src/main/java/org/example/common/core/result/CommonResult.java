@@ -53,10 +53,10 @@ public class CommonResult<T> implements Serializable {
     }
 
     public static <T> CommonResult<T> unauthorized() {
-        return new CommonResult<>(HttpStatus.UNAUTHORIZED.value(), CommonServerResult.UNAUTHORIZED, null);
+        return new CommonResult<>(HttpStatus.UNAUTHORIZED.value(), AuthenticationResult.UNAUTHORIZED, null);
     }
 
     public static <T> CommonResult<T> forbidden() {
-        return new CommonResult<>(HttpStatus.FORBIDDEN.value(), CommonServerResult.FORBIDDEN, null);
+        return new CommonResult<>(HttpStatus.FORBIDDEN.value(), AuthenticationResult.FORBIDDEN, null);
     }
 }

@@ -1,44 +1,28 @@
-package org.example.system.entity.vo;
+package org.example.common.core.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.example.common.core.domain.BaseEntity;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
 /**
  * @author lihui
- * @since 2022/10/29
+ * @since 2024/5/20
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UserVO extends BaseEntity {
+public class LoginUser extends BaseEntity {
     /**
      * 用户名
      */
     @NotNull(message = "用户名不能为空")
     private String username;
     /**
-     * 密码
-     */
-    @NotNull(message = "密码不能为空")
-    private String password;
-    /**
-     * 头像
-     */
-    private String icon;
-    /**
      * 手机号
      */
     private String phone;
-    /**
-     * 邮箱
-     */
-    @Email
-    private String email;
     /**
      * 姓名
      */
@@ -66,31 +50,11 @@ public class UserVO extends BaseEntity {
     /**
      * 菜单信息
      */
-    private List<MenuVO> menus;
-    /**
-     * 角色信息
-     */
-    private List<RoleVO> roles;
+    private List<String> menuIds;
     /**
      * 资源URL信息
      */
     private List<String> resourceUrls;
-    /**
-     * 部门信息
-     */
-    private List<DepartmentVO> departments;
-    /**
-     * 其他验证状态
-     * 0.关闭
-     * 1.图片验证码
-     * 2.短信验证码
-     * 3.公私钥验证
-     * 4.人脸验证
-     * 5.指纹验证
-     * 6.手势验证
-     * 7.邮箱验证
-     */
-    private String verifyStatus;
     /**
      * token过期时间
      */

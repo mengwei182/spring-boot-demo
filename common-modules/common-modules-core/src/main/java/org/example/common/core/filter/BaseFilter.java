@@ -4,8 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
+import org.example.common.core.domain.LoginUser;
 import org.example.common.core.domain.Token;
-import org.example.common.core.domain.UserContextEntity;
 import org.example.common.core.result.CommonResult;
 import org.example.common.core.result.CommonServerResult;
 import org.example.common.core.result.SystemServerResult;
@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -71,16 +72,16 @@ public class BaseFilter implements Filter {
             response.getWriter().print(JSON.toJSONString(CommonResult.unauthorized()));
             return;
         }
-        Token<UserContextEntity> token = TokenUtils.unsigned(authorization, UserContextEntity.class);
-        UserContextEntity userContextEntity = token.getData();
+        Token<LoginUser> token = TokenUtils.unsigned(authorization, LoginUser.class);
+        LoginUser loginUser = token.getData();
         // 校验token
-        if (!tokenFilter(authorization, userContextEntity.getId())) {
+        if (!tokenFilter(authorization, loginUser.getId())) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().print(JSON.toJSONString(CommonResult.unauthorized()));
             return;
         }
         // 校验资源
-        if (!resourceFilter(request.getServletPath(), userContextEntity.getResourceIds())) {
+        if (!resourceFilter(request.getServletPath(), loginUser.getResourceUrls())) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().print(JSON.toJSONString(CommonResult.unauthorized()));
         }
@@ -107,17 +108,23 @@ public class BaseFilter implements Filter {
             return false;
         }
         try {
-            // token过期
-            String token = caffeineRedisCache.get(SystemServerResult.USER_TOKEN_KEY + userId, String.class);
-            return !StrUtil.isEmpty(token) && authorization.equals(token);
+            // token是否有效
+            String tokenString = caffeineRedisCache.get(SystemServerResult.USER_TOKEN_KEY + userId, String.class);
+            boolean tokenValid = !StrUtil.isEmpty(tokenString) && authorization.equals(tokenString);
+            // token是否过期
+            Token<?> token = TokenUtils.unsigned(authorization);
+            Date currentDate = new Date();
+            Date expirationDate = token.getExpirationDate();
+            boolean tokenExpiration = expirationDate.getTime() <= currentDate.getTime();
+            return tokenValid && tokenExpiration;
         } catch (Exception e) {
             log.error(e.getMessage());
             return false;
         }
     }
 
-    private boolean resourceFilter(String servletPath, List<String> resourceIds) {
+    private boolean resourceFilter(String servletPath, List<String> resourceUrls) {
         AntPathMatcher antPathMatcher = new AntPathMatcher();
-        return resourceIds.stream().anyMatch(o -> antPathMatcher.match(o, servletPath));
+        return resourceUrls.stream().anyMatch(o -> antPathMatcher.match(o, servletPath));
     }
 }

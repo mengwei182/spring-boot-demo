@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.common.core.domain.Token;
 import org.springframework.beans.BeanUtils;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
@@ -61,14 +63,9 @@ public class TokenUtils {
      * @param token
      * @return
      */
-    public static Token<?> unsigned(String token) {
-        try {
-            byte[] bytes = decryptCipher.doFinal(Base64.getDecoder().decode(token.getBytes()));
-            return JSON.parseObject(new String(bytes), Token.class);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return new Token<>();
-        }
+    public static Token<?> unsigned(String token) throws IllegalBlockSizeException, BadPaddingException {
+        byte[] bytes = decryptCipher.doFinal(Base64.getDecoder().decode(token.getBytes()));
+        return JSON.parseObject(new String(bytes), Token.class);
     }
 
     /**
