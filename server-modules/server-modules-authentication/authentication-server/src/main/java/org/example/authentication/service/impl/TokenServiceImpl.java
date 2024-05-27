@@ -53,9 +53,10 @@ public class TokenServiceImpl implements TokenService {
             Date expirationDate = Date.from(expirationDateTime.atZone(ZoneId.systemDefault()).toInstant());
             // 重新签名生成token
             Token<?> token = new Token<>(userId, oldToken.getSignDate(), expirationDate, oldToken.getData());
+            String refresh = TokenUtils.sign(token);
             // 重新设置token
-            caffeineRedisCache.put(SystemServerResult.USER_TOKEN_KEY + userId, token, Duration.ofDays(Token.EXPIRATION_DAY));
-            return TokenUtils.sign(token);
+            caffeineRedisCache.put(SystemServerResult.USER_TOKEN_KEY + userId, refresh, Duration.ofDays(Token.EXPIRATION_DAY));
+            return refresh;
         } catch (Exception e) {
             throw new AuthenticationException(AuthenticationResult.TOKEN_REFRESH_FAIL);
         }
