@@ -6,7 +6,6 @@ import org.example.common.core.exception.SystemException;
 import org.example.common.core.result.SystemServerResult;
 import org.example.system.entity.User;
 import org.example.system.entity.UserLoginVO;
-import org.example.system.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
