@@ -3,14 +3,14 @@ package org.example.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.common.core.exception.SystemException;
-import org.example.common.core.result.SystemServerResult;
+import org.example.common.core.exception.ExceptionInformation;
 import org.example.common.core.util.CommonUtils;
 import org.example.common.core.util.PageUtils;
 import org.example.system.entity.Resource;
 import org.example.system.entity.ResourceCategory;
 import org.example.system.entity.vo.ResourceCategoryVO;
 import org.example.system.entity.vo.ResourceVO;
+import org.example.system.exception.SystemException;
 import org.example.system.mapper.ResourceCategoryMapper;
 import org.example.system.mapper.ResourceMapper;
 import org.example.system.query.ResourceCategoryQueryPage;
@@ -43,7 +43,7 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
         queryWrapper.lambda().eq(ResourceCategory::getName, resourceCategoryVo.getName());
         ResourceCategory resourceCategory = resourceCategoryMapper.selectOne(queryWrapper);
         if (resourceCategory != null) {
-            throw new SystemException(SystemServerResult.CATEGORY_EXIST);
+            throw new SystemException(ExceptionInformation.SYSTEM_3004.getCode(), ExceptionInformation.SYSTEM_3004.getMessage());
         }
         resourceCategory = new ResourceCategory();
         BeanUtils.copyProperties(resourceCategoryVo, resourceCategory);
@@ -63,11 +63,11 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
     public Boolean deleteResourceCategory(String id) {
         ResourceCategory resourceCategory = resourceCategoryMapper.selectById(id);
         if (resourceCategory == null) {
-            throw new SystemException(SystemServerResult.CATEGORY_NOT_EXIST);
+            throw new SystemException(ExceptionInformation.SYSTEM_3003.getCode(), ExceptionInformation.SYSTEM_3003.getMessage());
         }
         Long count = resourceMapper.selectCount(new LambdaQueryWrapper<Resource>().eq(Resource::getCategoryId, id));
         if (count != null && count > 0) {
-            throw new SystemException(SystemServerResult.CATEGORY_RESOURCE_EXIST);
+            throw new SystemException(ExceptionInformation.SYSTEM_3006.getCode(), ExceptionInformation.SYSTEM_3006.getMessage());
         }
         resourceCategoryMapper.deleteById(id);
         return true;
@@ -85,7 +85,7 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
         queryWrapper.lambda().eq(ResourceCategory::getName, resourceCategoryVo.getName());
         ResourceCategory resourceCategory = resourceCategoryMapper.selectOne(queryWrapper);
         if (resourceCategory != null) {
-            throw new SystemException(SystemServerResult.CATEGORY_EXIST);
+            throw new SystemException(ExceptionInformation.SYSTEM_3004.getCode(), ExceptionInformation.SYSTEM_3004.getMessage());
         }
         resourceCategory = new ResourceCategory();
         BeanUtils.copyProperties(resourceCategoryVo, resourceCategory);

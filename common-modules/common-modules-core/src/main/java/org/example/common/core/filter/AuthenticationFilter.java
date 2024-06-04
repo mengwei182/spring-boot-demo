@@ -4,11 +4,10 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
+import org.example.common.core.constant.CommonConstant;
 import org.example.common.core.domain.LoginUser;
 import org.example.common.core.domain.Token;
 import org.example.common.core.result.CommonResult;
-import org.example.common.core.result.CommonServerResult;
-import org.example.common.core.result.SystemServerResult;
 import org.example.common.core.util.TokenUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.annotation.Order;
@@ -94,8 +93,8 @@ public class AuthenticationFilter implements Filter {
 
     private String authorizationHeaderFilter(HttpServletRequest request) {
         // 校验请求中的token参数和数据
-        String authorizationHeader = request.getHeader(CommonServerResult.AUTHORIZATION);
-        String authorizationParameter = request.getParameter(CommonServerResult.AUTHORIZATION);
+        String authorizationHeader = request.getHeader(CommonConstant.AUTHORIZATION);
+        String authorizationParameter = request.getParameter(CommonConstant.AUTHORIZATION);
         return !StrUtil.isEmpty(authorizationHeader) ? authorizationHeader : authorizationParameter;
     }
 
@@ -106,7 +105,7 @@ public class AuthenticationFilter implements Filter {
         }
         try {
             // token是否有效
-            String tokenString = caffeineRedisCache.get(SystemServerResult.USER_TOKEN_KEY + userId, String.class);
+            String tokenString = caffeineRedisCache.get("USER_TOKEN_KEY_" + userId, String.class);
             boolean tokenValid = !StrUtil.isEmpty(tokenString) && authorization.equals(tokenString);
             // token是否过期
             Token<?> token = TokenUtils.unsigned(authorization);

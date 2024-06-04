@@ -9,8 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
 import org.example.common.core.domain.LoginUser;
-import org.example.common.core.exception.SystemException;
-import org.example.common.core.result.SystemServerResult;
+import org.example.common.core.exception.ExceptionInformation;
 import org.example.common.core.usercontext.UserContext;
 import org.example.common.core.util.CommonUtils;
 import org.example.common.core.util.PageUtils;
@@ -29,6 +28,7 @@ import org.example.system.entity.vo.MenuVO;
 import org.example.system.entity.vo.RoleVO;
 import org.example.system.entity.vo.UserVO;
 import org.example.system.entity.vo.UsernamePasswordVO;
+import org.example.system.exception.SystemException;
 import org.example.system.mapper.DepartmentMapper;
 import org.example.system.mapper.MenuMapper;
 import org.example.system.mapper.ResourceMapper;
@@ -95,16 +95,16 @@ public class UserServiceImpl implements UserService {
         String username = userVO.getUsername();
         String password = userVO.getPassword();
         if (StrUtil.isEmpty(username)) {
-            throw new SystemException(SystemServerResult.USERNAME_NULL);
+            throw new SystemException(ExceptionInformation.AUTHENTICATION_2007.getCode(), ExceptionInformation.AUTHENTICATION_2007.getMessage());
         }
         if (StrUtil.isEmpty(password)) {
-            throw new SystemException(SystemServerResult.PASSWORD_NULL);
+            throw new SystemException(ExceptionInformation.AUTHENTICATION_2008.getCode(), ExceptionInformation.AUTHENTICATION_2008.getMessage());
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getUsername, username);
         User user = userMapper.selectOne(queryWrapper);
         if (user != null) {
-            throw new SystemException(SystemServerResult.USER_EXIST);
+            throw new SystemException(ExceptionInformation.AUTHENTICATION_2010.getCode(), ExceptionInformation.AUTHENTICATION_2010.getMessage());
         }
         user = new User();
         BeanUtils.copyProperties(userVO, user);
@@ -124,11 +124,11 @@ public class UserServiceImpl implements UserService {
         // 添加角色信息
         List<String> roleIds = userVO.getRoleIds();
         if (CollectionUtil.isEmpty(roleIds)) {
-            throw new SystemException(SystemServerResult.ROLE_NULL);
+            throw new SystemException(ExceptionInformation.SYSTEM_3016.getCode(), ExceptionInformation.SYSTEM_3016.getMessage());
         }
         for (String roleId : roleIds) {
             if (Role.ADMIN_ID.equals(roleId)) {
-                throw new SystemException(SystemServerResult.ROLE_ADMIN_EXIST);
+                throw new SystemException(ExceptionInformation.SYSTEM_3017.getCode(), ExceptionInformation.SYSTEM_3017.getMessage());
             }
             UserRoleRelation userRoleRelation = new UserRoleRelation();
             userRoleRelation.setUserId(user.getId());
@@ -148,7 +148,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO getUserInfo(String id) {
         if (StrUtil.isEmpty(id)) {
-            throw new SystemException(SystemServerResult.USER_NOT_EXIST);
+            throw new SystemException(ExceptionInformation.AUTHENTICATION_2011.getCode(), ExceptionInformation.AUTHENTICATION_2011.getMessage());
         }
         UserVO userVO;
         LoginUser loginUser = caffeineRedisCache.get(id, LoginUser.class);
@@ -216,7 +216,7 @@ public class UserServiceImpl implements UserService {
     public Boolean updateUser(UserVO userVO) {
         User user = userMapper.selectById(userVO.getId());
         if (user == null) {
-            throw new SystemException(SystemServerResult.USER_NOT_EXIST);
+            throw new SystemException(ExceptionInformation.AUTHENTICATION_2011.getCode(), ExceptionInformation.AUTHENTICATION_2011.getMessage());
         }
         BeanUtils.copyProperties(userVO, user);
         userMapper.updateById(user);
@@ -233,12 +233,12 @@ public class UserServiceImpl implements UserService {
     public Boolean updateUserPassword(UsernamePasswordVO usernamePasswordVo) {
         User user = userMapper.selectById(usernamePasswordVo.getId());
         if (user == null) {
-            throw new SystemException(SystemServerResult.USER_NOT_EXIST);
+            throw new SystemException(ExceptionInformation.AUTHENTICATION_2011.getCode(), ExceptionInformation.AUTHENTICATION_2011.getMessage());
         }
         String password = user.getPassword();
         String oldPassword = usernamePasswordVo.getOldPassword();
         if (!passwordEncoder.matches(oldPassword, password)) {
-            throw new SystemException(SystemServerResult.OLD_PASSWORD_ERROR);
+            throw new SystemException(ExceptionInformation.AUTHENTICATION_2013.getCode(), ExceptionInformation.AUTHENTICATION_2013.getMessage());
         }
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().set(User::getPassword, passwordEncoder.encode(usernamePasswordVo.getPassword())).eq(User::getId, user.getId());

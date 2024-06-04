@@ -4,9 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.example.common.core.exception.SystemException;
-import org.example.common.core.result.CommonServerResult;
-import org.example.common.core.result.SystemServerResult;
+import org.example.common.core.exception.ExceptionInformation;
 import org.example.common.core.util.CommonUtils;
 import org.example.common.core.util.PageUtils;
 import org.example.system.entity.Role;
@@ -14,6 +12,7 @@ import org.example.system.entity.RoleMenuRelation;
 import org.example.system.entity.UserRoleRelation;
 import org.example.system.entity.vo.RoleMenuRelationVO;
 import org.example.system.entity.vo.RoleVO;
+import org.example.system.exception.SystemException;
 import org.example.system.mapper.RoleMapper;
 import org.example.system.mapper.RoleMenuRelationMapper;
 import org.example.system.mapper.UserRoleRelationMapper;
@@ -53,7 +52,7 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryWrapper<Role> queryWrapper = new LambdaQueryWrapper<>();
         Role resultRole = roleMapper.selectOne(queryWrapper.eq(Role::getName, roleVo.getName()));
         if (resultRole != null) {
-            throw new SystemException(SystemServerResult.ROLE_NAME_EXIST);
+            throw new SystemException(ExceptionInformation.SYSTEM_3012.getCode(), ExceptionInformation.SYSTEM_3012.getMessage());
         }
         roleMapper.insert(role);
         return true;
@@ -70,7 +69,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean deleteRole(String id) {
         Role role = roleMapper.selectById(id);
         if (role == null) {
-            throw new SystemException(CommonServerResult.OBJECT_NOT_EXIST);
+            throw new SystemException(ExceptionInformation.EXCEPTION_1001.getCode(), ExceptionInformation.EXCEPTION_1001.getMessage());
         }
         roleMapper.deleteById(id);
         QueryWrapper<UserRoleRelation> userRoleRelationQueryWrapper = new QueryWrapper<>();
@@ -92,7 +91,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean updateRole(RoleVO roleVo) {
         Role role = roleMapper.selectById(roleVo.getId());
         if (role == null) {
-            throw new SystemException(CommonServerResult.OBJECT_NOT_EXIST);
+            throw new SystemException(ExceptionInformation.EXCEPTION_1001.getCode(), ExceptionInformation.EXCEPTION_1001.getMessage());
         }
         role = new Role();
         BeanUtils.copyProperties(roleVo, role);
@@ -111,7 +110,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean addRoleMenu(RoleMenuRelationVO roleMenuRelationVo) {
         Role role = roleMapper.selectById(roleMenuRelationVo.getRoleId());
         if (role == null) {
-            throw new SystemException(CommonServerResult.OBJECT_NOT_EXIST);
+            throw new SystemException(ExceptionInformation.EXCEPTION_1001.getCode(), ExceptionInformation.EXCEPTION_1001.getMessage());
         }
         QueryWrapper<RoleMenuRelation> roleMenuRelationQueryWrapper = new QueryWrapper<>();
         roleMenuRelationQueryWrapper.lambda().eq(RoleMenuRelation::getRoleId, roleMenuRelationVo.getRoleId());
