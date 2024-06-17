@@ -18,12 +18,7 @@
         <!--module start-->
         <dependency>
             <groupId>org.example</groupId>
-            <artifactId>authentication-server</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>system-server</artifactId>
+            <artifactId>server-modules-system</artifactId>
             <version>${revision}</version>
         </dependency>
         <!--module end-->
