@@ -5,7 +5,6 @@ import org.example.common.core.constant.CommonConstant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.AntPathMatcher;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -24,7 +23,6 @@ import springfox.documentation.spring.web.plugins.ApiSelectorBuilder;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,8 +40,6 @@ public class SwaggerConfiguration {
     private String serverPort;
     @Value("${spring.profiles.active}")
     private String profile;
-    @Value("${skip-urls}")
-    private String skipUrls;
 
     @Bean
     public Docket openApi() {
@@ -83,14 +79,12 @@ public class SwaggerConfiguration {
     }
 
     private List<SecurityContext> getSecurityContexts() {
-        AntPathMatcher antPathMatcher = new AntPathMatcher();
         return Collections.singletonList(SecurityContext.builder()
                 .securityReferences(Collections.singletonList(SecurityReference.builder()
                         .reference(CommonConstant.AUTHORIZATION)
                         .scopes(new AuthorizationScope[]{new AuthorizationScope("global", "accessEverything")})
                         .build()))
-                // 需要认证的请求路径
-                .operationSelector(operationContext -> Arrays.stream(skipUrls.split(",")).noneMatch(o -> antPathMatcher.match(o, operationContext.requestMappingPattern())))
+                .operationSelector(o -> o.requestMappingPattern().matches("/.*"))
                 .build());
     }
 }
