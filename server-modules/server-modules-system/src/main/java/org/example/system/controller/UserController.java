@@ -7,7 +7,7 @@ import org.example.common.core.result.CommonResult;
 import org.example.common.core.usercontext.UserContext;
 import org.example.system.entity.vo.UserVO;
 import org.example.system.entity.vo.UsernamePasswordVO;
-import org.example.system.query.UserQueryPage;
+import org.example.system.entity.query.UserQueryPage;
 import org.example.system.service.UserService;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
