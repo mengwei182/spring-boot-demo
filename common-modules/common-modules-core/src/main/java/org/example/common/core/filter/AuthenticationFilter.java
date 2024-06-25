@@ -51,9 +51,6 @@ public class AuthenticationFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         // 简单请求直接放行
         if (HttpMethod.OPTIONS.toString().equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
@@ -67,19 +64,27 @@ public class AuthenticationFilter implements Filter {
         // 校验请求中的token参数和数据
         String authorization = authorizationHeaderFilter(request);
         if (StrUtil.isEmpty(authorization)) {
-            printUnauthorized(response);
+            writeUnauthorized(response);
             return;
         }
-        Token<LoginUser> token = TokenUtils.unsigned(authorization, LoginUser.class);
+        Token<LoginUser> token;
+        try {
+            token = TokenUtils.unsigned(authorization, LoginUser.class);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            writeUnauthorized(response);
+            return;
+        }
         LoginUser loginUser = token.getData();
         // token是否有效
         if (!tokenValid(authorization, loginUser.getId())) {
-            printUnauthorized(response);
+            writeUnauthorized(response);
             return;
         }
         // resource是否有效
         if (!resourceValid(request.getServletPath(), loginUser.getResourceUrls())) {
-            printUnauthorized(response);
+            writeUnauthorized(response);
+            return;
         }
         filterChain.doFilter(request, response);
     }
@@ -124,7 +129,9 @@ public class AuthenticationFilter implements Filter {
         return resourceUrls.stream().anyMatch(o -> antPathMatcher.match(o, servletPath));
     }
 
-    private void printUnauthorized(HttpServletResponse response) throws IOException {
+    private void writeUnauthorized(HttpServletResponse response) throws IOException {
+        response.setCharacterEncoding("UTF-8");
+        response.addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().print(JSON.toJSONString(CommonResult.unauthorized()));
     }
