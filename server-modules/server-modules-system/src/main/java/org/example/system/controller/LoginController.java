@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 
@@ -53,8 +51,6 @@ public class LoginController {
     /**
      * 获取图片验证码
      *
-     * @param request
-     * @param response
      * @param width 图片宽度
      * @param height 图片高度
      * @param captchaSize 验证码位数
@@ -62,7 +58,7 @@ public class LoginController {
      */
     @ApiOperation("获取图片验证码")
     @GetMapping("/login/image/captcha")
-    public void getImageCaptcha(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "130") Integer width, @RequestParam(defaultValue = "30") Integer height, @RequestParam(defaultValue = "4") Integer captchaSize) throws IOException {
-        loginService.generateImageCaptcha(request, response, width, height, captchaSize);
+    public void getImageCaptcha(@RequestParam(defaultValue = "130") Integer width, @RequestParam(defaultValue = "30") Integer height, @RequestParam(defaultValue = "4") Integer captchaSize) throws IOException {
+        loginService.generateImageCaptcha(width, height, captchaSize);
     }
 }

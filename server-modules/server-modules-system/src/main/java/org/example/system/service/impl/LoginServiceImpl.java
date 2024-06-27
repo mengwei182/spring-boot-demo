@@ -1,14 +1,9 @@
 package org.example.system.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
 import org.example.CaffeineRedisCache;
-import org.example.system.exception.AuthenticationException;
-import org.example.system.service.LoginService;
-import org.example.system.service.TokenService;
-import org.example.system.strategy.LoginVerifyTypeStrategy;
 import org.example.common.core.domain.LoginUser;
 import org.example.common.core.domain.Token;
 import org.example.common.core.enums.UserVerifyTypeStatusEnum;
@@ -20,11 +15,16 @@ import org.example.common.core.util.TokenUtils;
 import org.example.system.constant.SystemServerConstant;
 import org.example.system.entity.User;
 import org.example.system.entity.UserLoginVO;
-import org.example.system.entity.vo.ResourceVO;
+import org.example.system.entity.vo.UserVO;
+import org.example.system.exception.AuthenticationException;
 import org.example.system.mapper.UserMapper;
-import org.example.system.service.ResourceService;
+import org.example.system.service.LoginService;
+import org.example.system.service.TokenService;
 import org.example.system.service.UserService;
+import org.example.system.strategy.LoginVerifyTypeStrategy;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -36,8 +36,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author lihui
@@ -50,8 +48,6 @@ public class LoginServiceImpl implements LoginService {
     private UserMapper userMapper;
     @Resource
     private CaffeineRedisCache caffeineRedisCache;
-    @Resource
-    private ResourceService resourceService;
     @Resource
     private UserService userService;
     @Resource
@@ -95,10 +91,8 @@ public class LoginServiceImpl implements LoginService {
         }
         LoginUser loginUser = CommonUtils.transformObject(user, LoginUser.class);
         // 查询并设置登录用户的resource数据
-        List<ResourceVO> resources = resourceService.getResourceByUserId(user.getId());
-        if (!CollectionUtil.isEmpty(resources)) {
-            loginUser.setResourceUrls(resources.stream().map(ResourceVO::getUrl).collect(Collectors.toList()));
-        }
+        UserVO userVO = userService.getUserInformation(user.getId());
+        loginUser.setResourceUrls(userVO.getResourceUrls());
         // 登录时间
         LocalDateTime localDateTime = LocalDateTime.now();
         Date loginDate = Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
@@ -130,7 +124,6 @@ public class LoginServiceImpl implements LoginService {
         }
         userService.clearUserCache(loginUser.getId());
         tokenService.clearTokenCache(loginUser.getId());
-        resourceService.clearResourceCache(loginUser.getId());
         caffeineRedisCache.evict(SystemServerConstant.USER_TOKEN_KEY + loginUser.getId());
         UserContext.remove();
         return true;
@@ -139,15 +132,22 @@ public class LoginServiceImpl implements LoginService {
     /**
      * 生成图片验证码
      *
-     * @param request
-     * @param response
      * @param width 图片宽度
      * @param height 图片高度
      * @param captchaSize 验证码位数
      * @throws IOException
      */
     @Override
-    public void generateImageCaptcha(HttpServletRequest request, HttpServletResponse response, Integer width, Integer height, Integer captchaSize) throws IOException {
+    public void generateImageCaptcha(Integer width, Integer height, Integer captchaSize) throws IOException {
+        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (servletRequestAttributes == null) {
+            throw new AuthenticationException(ExceptionInformation.EXCEPTION_1000.getCode(), ExceptionInformation.EXCEPTION_1000.getMessage());
+        }
+        HttpServletRequest request = servletRequestAttributes.getRequest();
+        HttpServletResponse response = servletRequestAttributes.getResponse();
+        if (response == null) {
+            throw new AuthenticationException(ExceptionInformation.EXCEPTION_1000.getCode(), ExceptionInformation.EXCEPTION_1000.getMessage());
+        }
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache");
         response.setDateHeader("Expires", 0);

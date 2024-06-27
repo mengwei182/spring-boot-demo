@@ -23,7 +23,7 @@ public interface DictionaryService {
      * @param id
      * @return
      */
-    Boolean deleteDictionary(String id);
+    Boolean deleteDictionary(Long id);
 
     /**
      * 更新字典

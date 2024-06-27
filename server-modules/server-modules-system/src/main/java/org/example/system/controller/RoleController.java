@@ -52,7 +52,7 @@ public class RoleController {
      */
     @ApiOperation("删除角色")
     @DeleteMapping("/delete")
-    public CommonResult<Boolean> deleteRole(@RequestParam String id) {
+    public CommonResult<Boolean> deleteRole(@RequestParam Long id) {
         return CommonResult.success(roleService.deleteRole(id));
     }
 

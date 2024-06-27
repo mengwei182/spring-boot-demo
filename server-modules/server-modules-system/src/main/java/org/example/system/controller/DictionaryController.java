@@ -51,7 +51,7 @@ public class DictionaryController {
      */
     @ApiOperation("删除字典")
     @DeleteMapping("/delete")
-    public CommonResult<Boolean> deleteDictionary(@RequestParam String id) {
+    public CommonResult<Boolean> deleteDictionary(@RequestParam Long id) {
         return CommonResult.success(dictionaryService.deleteDictionary(id));
     }
 

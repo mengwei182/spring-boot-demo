@@ -26,7 +26,7 @@ public interface RoleService {
      * @param id
      * @return
      */
-    Boolean deleteRole(String id);
+    Boolean deleteRole(Long id);
 
     /**
      * 更新角色

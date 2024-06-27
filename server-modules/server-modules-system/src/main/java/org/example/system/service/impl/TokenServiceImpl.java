@@ -39,7 +39,7 @@ public class TokenServiceImpl implements TokenService {
             throw new ServerException(ExceptionInformation.AUTHENTICATION_2011.getCode(), ExceptionInformation.AUTHENTICATION_2011.getMessage());
         }
         try {
-            String userId = loginUser.getId();
+            Long userId = loginUser.getId();
             String tokenString = caffeineRedisCache.get(SystemServerConstant.USER_TOKEN_KEY + userId, String.class);
             if (StrUtil.isEmpty(tokenString)) {
                 throw new ServerException(ExceptionInformation.AUTHENTICATION_2005.getCode(), ExceptionInformation.AUTHENTICATION_2005.getMessage());
@@ -67,7 +67,7 @@ public class TokenServiceImpl implements TokenService {
      * @param userId
      */
     @Override
-    public void clearTokenCache(String userId) {
+    public void clearTokenCache(Long userId) {
         caffeineRedisCache.evict(SystemServerConstant.USER_TOKEN_KEY + userId);
     }
 }

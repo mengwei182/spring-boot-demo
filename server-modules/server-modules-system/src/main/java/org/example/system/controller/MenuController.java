@@ -51,7 +51,7 @@ public class MenuController {
      */
     @ApiOperation("删除菜单")
     @DeleteMapping("/delete")
-    public CommonResult<Boolean> deleteMenu(@RequestParam String id) {
+    public CommonResult<Boolean> deleteMenu(@RequestParam Long id) {
         return CommonResult.success(menuService.deleteMenu(id));
     }
 

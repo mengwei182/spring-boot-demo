@@ -42,15 +42,15 @@ public class LoginUser extends BaseEntity {
     /**
      * 角色ID集合
      */
-    private List<String> roleIds;
+    private List<Long> roleIds;
     /**
      * 部门ID集合
      */
-    private List<String> departmentIds;
+    private List<Long> departmentIds;
     /**
      * 菜单信息
      */
-    private List<String> menuIds;
+    private List<Long> menuIds;
     /**
      * 资源URL信息
      */

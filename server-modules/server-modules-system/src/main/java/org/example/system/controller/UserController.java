@@ -64,9 +64,9 @@ public class UserController {
      * @return
      */
     @ApiOperation("查看用户详情")
-    @GetMapping("/info")
-    public CommonResult<UserVO> getUserInfo() {
-        return CommonResult.success(userService.getUserInfo(UserContext.get().getId()));
+    @GetMapping("/information")
+    public CommonResult<UserVO> getUserInformation() {
+        return CommonResult.success(userService.getUserInformation(UserContext.get().getId()));
     }
 
     /**
@@ -101,7 +101,7 @@ public class UserController {
      */
     @ApiOperation("删除用户")
     @DeleteMapping("/delete")
-    public CommonResult<Boolean> deleteUser(@RequestParam String id) {
+    public CommonResult<Boolean> deleteUser(@RequestParam Long id) {
         return CommonResult.success(userService.deleteUser(id));
     }
 
@@ -113,7 +113,7 @@ public class UserController {
      */
     @ApiOperation("获取密钥")
     @GetMapping("/getPublicKey")
-    public CommonResult<String> getPublicKey(@RequestParam String id) throws NoSuchAlgorithmException {
+    public CommonResult<String> getPublicKey(@RequestParam Long id) throws NoSuchAlgorithmException {
         return CommonResult.success(userService.getPublicKey(id));
     }
 }

@@ -25,7 +25,7 @@ public interface MenuService {
      * @param id
      * @return
      */
-    Boolean deleteMenu(String id);
+    Boolean deleteMenu(Long id);
 
     /**
      * 更新菜单

@@ -48,7 +48,6 @@ public class RoleServiceImpl implements RoleService {
     public Boolean addRole(RoleVO roleVo) {
         Role role = new Role();
         BeanUtils.copyProperties(roleVo, role);
-        role.setId(CommonUtils.uuid());
         LambdaQueryWrapper<Role> queryWrapper = new LambdaQueryWrapper<>();
         Role resultRole = roleMapper.selectOne(queryWrapper.eq(Role::getName, roleVo.getName()));
         if (resultRole != null) {
@@ -66,7 +65,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     @Transactional
-    public Boolean deleteRole(String id) {
+    public Boolean deleteRole(Long id) {
         Role role = roleMapper.selectById(id);
         if (role == null) {
             throw new SystemException(ExceptionInformation.EXCEPTION_1001.getCode(), ExceptionInformation.EXCEPTION_1001.getMessage());
@@ -115,11 +114,10 @@ public class RoleServiceImpl implements RoleService {
         QueryWrapper<RoleMenuRelation> roleMenuRelationQueryWrapper = new QueryWrapper<>();
         roleMenuRelationQueryWrapper.lambda().eq(RoleMenuRelation::getRoleId, roleMenuRelationVo.getRoleId());
         roleMenuRelationMapper.delete(roleMenuRelationQueryWrapper);
-        List<String> menuIds = roleMenuRelationVo.getMenuIds();
+        List<Long> menuIds = roleMenuRelationVo.getMenuIds();
         if (!CollectionUtil.isEmpty(menuIds)) {
             menuIds.forEach(menuId -> {
                 RoleMenuRelation roleMenuRelation = new RoleMenuRelation();
-                roleMenuRelation.setId(CommonUtils.uuid());
                 roleMenuRelation.setRoleId(roleMenuRelationVo.getRoleId());
                 roleMenuRelation.setMenuId(menuId);
                 roleMenuRelationMapper.insert(roleMenuRelation);

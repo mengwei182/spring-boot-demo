@@ -33,7 +33,7 @@ public interface UserService {
      *
      * @return
      */
-    UserVO getUserInfo(String id);
+    UserVO getUserInformation(Long id);
 
     /**
      * 更新用户信息
@@ -57,7 +57,7 @@ public interface UserService {
      * @param id
      * @return
      */
-    Boolean deleteUser(String id);
+    Boolean deleteUser(Long id);
 
     /**
      * 获取密钥
@@ -65,12 +65,12 @@ public interface UserService {
      * @param id
      * @return
      */
-    String getPublicKey(String id) throws NoSuchAlgorithmException;
+    String getPublicKey(Long id) throws NoSuchAlgorithmException;
 
     /**
      * 清理用户信息缓存
      *
      * @param userId
      */
-    void clearUserCache(String userId);
+    void clearUserCache(Long userId);
 }

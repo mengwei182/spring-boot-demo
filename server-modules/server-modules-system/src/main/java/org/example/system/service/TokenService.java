@@ -17,5 +17,5 @@ public interface TokenService {
      *
      * @param userId
      */
-    void clearTokenCache(String userId);
+    void clearTokenCache(Long userId);
 }
