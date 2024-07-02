@@ -2,11 +2,11 @@ package org.example.system.strategy;
 
 import cn.hutool.core.util.StrUtil;
 import org.example.CaffeineRedisCache;
-import org.example.system.exception.AuthenticationException;
 import org.example.common.core.constant.RedisKeyConstant;
 import org.example.common.core.enums.UserVerifyTypeStatusEnum;
 import org.example.common.core.exception.ExceptionInformation;
 import org.example.system.entity.UserLoginVO;
+import org.example.system.exception.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;

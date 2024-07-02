@@ -2,6 +2,7 @@ package org.example.system.service;
 
 
 import org.example.system.entity.UserLoginVO;
+import org.example.system.entity.vo.TokenVO;
 
 import java.io.IOException;
 
@@ -16,7 +17,7 @@ public interface LoginService {
      * @param userLoginVO
      * @return
      */
-    String login(UserLoginVO userLoginVO);
+    TokenVO login(UserLoginVO userLoginVO);
 
     /**
      * 登出

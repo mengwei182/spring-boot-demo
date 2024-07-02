@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.example.common.core.result.CommonResult;
 import org.example.system.entity.UserLoginVO;
+import org.example.system.entity.vo.TokenVO;
 import org.example.system.service.LoginService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +34,7 @@ public class LoginController {
      */
     @ApiOperation("登录")
     @PostMapping("/login")
-    public CommonResult<String> login(@Valid @RequestBody UserLoginVO userLoginVO) {
+    public CommonResult<TokenVO> login(@Valid @RequestBody UserLoginVO userLoginVO) {
         return CommonResult.success(loginService.login(userLoginVO));
     }
 
