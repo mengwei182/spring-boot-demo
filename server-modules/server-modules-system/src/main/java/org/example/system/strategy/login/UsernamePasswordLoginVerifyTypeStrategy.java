@@ -1,4 +1,4 @@
-package org.example.system.strategy;
+package org.example.system.strategy.login;
 
 import org.example.common.core.enums.UserVerifyTypeStatusEnum;
 import org.example.common.core.exception.ExceptionInformation;

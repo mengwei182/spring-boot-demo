@@ -22,7 +22,7 @@ import org.example.system.mapper.UserMapper;
 import org.example.system.service.LoginService;
 import org.example.system.service.TokenService;
 import org.example.system.service.UserService;
-import org.example.system.strategy.LoginVerifyTypeStrategy;
+import org.example.system.strategy.login.LoginVerifyTypeStrategy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -55,7 +55,7 @@ public class LoginServiceImpl implements LoginService {
     @Resource
     private TokenService tokenService;
     /**
-     * 授权令牌accessToken的有效期
+     * 授权令牌accessToken的有效期，默认7天
      */
     @Value("${authentication.accessTokenExpire:7}")
     private int accessTokenExpire;

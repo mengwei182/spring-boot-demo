@@ -1,4 +1,4 @@
-package org.example.system.strategy;
+package org.example.system.strategy.login;
 
 import lombok.Data;
 import org.example.system.entity.User;

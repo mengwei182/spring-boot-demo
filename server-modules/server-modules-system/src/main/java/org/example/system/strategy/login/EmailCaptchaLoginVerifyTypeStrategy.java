@@ -1,4 +1,4 @@
-package org.example.system.strategy;
+package org.example.system.strategy.login;
 
 import cn.hutool.core.util.StrUtil;
 import org.example.CaffeineRedisCache;
