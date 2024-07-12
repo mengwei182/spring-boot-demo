@@ -16,6 +16,9 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  cache:
+    redis:
+      use-key-prefix: false
 
 mybatis:
   mapper-locations: classpath:/mapper/*.xml
@@ -27,4 +30,4 @@ log:
     name: spring-boot-demo.log
     path: logs
 
-skip-urls: /swagger-ui/**,/swagger-ui.html,/swagger-resources/**,/v2/api-docs,/v3/api-docs,/login,/login/image/captcha,/token/refresh
+skip-urls: /swagger-ui/**,/swagger-ui.html,/swagger-resources/**,/v2/api-docs,/v3/api-docs,/login,/login/image/captcha,/token/refresh,/test
