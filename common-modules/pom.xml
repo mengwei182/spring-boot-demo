@@ -30,14 +30,6 @@
             <artifactId>spring-beans</artifactId>
         </dependency>
         <!--spring end-->
-
-        <!--mybatis start-->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-extension</artifactId>
-            <version>${mybatis.plus.boot.starter.version}</version>
-        </dependency>
-        <!--mybatis end-->
     </dependencies>
 
     <build>
